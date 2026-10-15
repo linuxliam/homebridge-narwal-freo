@@ -32,6 +32,7 @@ class UiServer extends HomebridgePluginUiServer {
       }
       return {
         robots: devices.map(d => ({
+          id: d.deviceId,
           name: d.robotName ?? 'Robot',
           serial: d.snNumber ?? d.deviceId,
           firmware: d.firmwareVersion,
@@ -42,14 +43,20 @@ class UiServer extends HomebridgePluginUiServer {
 
     this.onRequest('/clean-mode-defaults', () => DEFAULT_CLEAN_MODES);
 
-    // What the running plugin has saved: the robot and its rooms (no tokens leave this process).
+    // What the running plugin has saved: each robot's rooms, by device ID (no tokens leave this process).
     this.onRequest('/status', async () => {
+      let store;
       try {
-        const store = JSON.parse(await readFile(join(this.homebridgeStoragePath, 'narwal', 'state.json'), 'utf8'));
-        return { started: true, rooms: (store.rooms ?? []).map(r => r.name) };
+        store = JSON.parse(await readFile(join(this.homebridgeStoragePath, 'narwal', 'state.json'), 'utf8'));
       } catch {
-        return { started: false, rooms: [] };
+        return { started: false, rooms: {} };
       }
+      // Up to 0.2.x the plugin kept one robot's state at the top level.
+      const robots = store.robots ?? (store.deviceId ? { [store.deviceId]: store } : {});
+      return {
+        started: true,
+        rooms: Object.fromEntries(Object.entries(robots).map(([id, r]) => [id, (r.rooms ?? []).map(room => room.name)])),
+      };
     });
 
     this.ready();
