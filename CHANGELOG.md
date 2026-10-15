@@ -12,6 +12,8 @@
   one is done.
 - New settings page, laid out like homebridge-ecobee-security's: sign in to Narwal (checked straight
   away), then a card per robot with its rooms and collapsible clean-mode tables, and the security hold.
+- Clean modes set up the same way get their slot name in the label ("… (Quick)"): Matter needs unique
+  labels, and matter.js refused to publish the vacuum with two the same.
 - `cleanModes`: choose what each Home app clean mode does: passes, suction and water level for
   every Vacuum / Mop / Vacuum + Mop slot, and the task (Vacuum and Mop, Vacuum then Mop, Freo Mind)
   for the combined ones. The settings page groups them per Home app button.
