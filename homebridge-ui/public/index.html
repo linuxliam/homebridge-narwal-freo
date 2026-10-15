@@ -253,32 +253,37 @@
       : 'Save and restart the bridge; then open the Narwal app on this robot\'s map for a minute so it sends its rooms.' });
   }
 
+  // The settings each Home app button's modes have.
+  const GROUP_FIELDS = { 'Vacuum': ['passes', 'suction'], 'Mop': ['passes', 'water'], 'Vacuum + Mop': ['task', 'passes', 'suction', 'water'] };
+  const FIELD_TITLES = { task: 'Task', passes: 'Passes', suction: 'Suction', water: 'Water' };
+
   /** One Home app button's slots as a small table. */
   function modeGroup(serial, entry, [group, slots]) {
+    const fields = GROUP_FIELDS[group];
     const body = el('tbody');
     const render = () => {
       body.textContent = '';
       for (const [key, label] of slots) {
         const value = { ...defaults[key], ...entry.cleanModes?.[key] };
-        const mind = value.task === 'freo_mind';
         const cells = [el('td', { textContent: label })];
-        for (const field of ['task', 'passes', 'suction', 'water']) {
-          const applies = field === 'task' ? key.startsWith('both')
-            : !mind && !(field === 'suction' && key.startsWith('mop')) && !(field === 'water' && key.startsWith('vacuum'));
-          cells.push(applies
-            ? el('td', {}, select(field, value[field] ?? 'app', async v => {
-              entry = await setMode(serial, key, field, v);
-              if (field === 'task') {
-                render();
-              }
-            }))
-            : el('td', { className: 'hint', textContent: field === 'task' ? group : mind ? 'Robot decides' : '—' }));
+        for (const field of fields) {
+          if (value.task === 'freo_mind' && field !== 'task') {
+            // Freo Mind picks its own passes, suction and water.
+            cells.push(el('td', { className: 'hint', colSpan: fields.length - 1, textContent: 'The robot decides' }));
+            break;
+          }
+          cells.push(el('td', {}, select(field, value[field] ?? 'app', async v => {
+            entry = await setMode(serial, key, field, v);
+            if (field === 'task') {
+              render();
+            }
+          })));
         }
         body.append(el('tr', {}, ...cells));
       }
     };
     render();
-    const head = el('thead', {}, el('tr', {}, ...['', 'Task', 'Passes', 'Suction', 'Water'].map(t => el('th', { textContent: t }))));
+    const head = el('thead', {}, el('tr', {}, el('th'), ...fields.map(f => el('th', { textContent: FIELD_TITLES[f] }))));
     return el('details', { className: 'group' },
       el('summary', { textContent: group }),
       el('div', { className: 'table-responsive mt-2' }, el('table', { className: 'table table-sm modes mb-1' }, head, body)));
