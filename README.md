@@ -27,22 +27,25 @@ Message formats come from the MIT-licensed Home Assistant integrations
 Set it up from the plugin's settings page in the Homebridge UI:
 
 - **Narwal account:** sign in with the email and password you use in the Narwal app. The page checks
-  them with Narwal straight away and shows the robot it found (pick one if the account has several).
-- **Rooms:** the room list the plugin has received, or what to do to get it.
-- **Clean modes:** what each Home app clean mode does (see below).
-- Below those: name, the cleaning sensor and consumables, and the ecobee security hold.
+  them with Narwal straight away and lists the robots on the account.
+- **One card per robot:** whether it shows in the Home app, its name (e.g. "Upstairs" and
+  "Downstairs"), its rooms (or what to do to get them), its clean modes, the cleaning sensor and
+  consumables. Each robot is its own Matter vacuum with its own pairing code.
+- **Security system:** the optional security hold (see below).
 
 The same settings in `config.json`:
 
 ```json
 {
   "platform": "NarwalPlatform",
-  "name": "Freo",
+  "name": "Narwal Freo",
   "email": "you@example.com",
   "password": "…",
-  "defaultCleanMode": "both",
-  "cleaningSensor": true,
-  "consumables": true,
+  "robots": [
+    { "serialNumber": "YA3…", "name": "Downstairs", "cleaningSensor": true, "consumables": true },
+    { "serialNumber": "YA4…", "name": "Upstairs", "cleanModes": { "both": { "task": "vacuum_then_mop" } } }
+  ],
+  "securityHold": true,
   "_bridge": {
     "username": "…",
     "port": 51916,
@@ -53,7 +56,8 @@ The same settings in `config.json`:
 ```
 
 `disableIpv4` keeps Matter's mDNS off IPv4 so it doesn't compete with avahi, which advertises the
-HomeKit bridges.
+HomeKit bridges. Configs from 0.2.x (one robot's settings at the top level, no `robots`) still
+work; opening the settings page moves them into `robots`.
 
 ## Clean modes in the Home app
 
@@ -134,13 +138,31 @@ setup code); the vacuum keeps its own Matter pairing.
   battery, sensor — with Narwal's message as the details. Codes not in the table are routine
   notices (e.g. 0x01010072 during mop runs) and are ignored. The cloud work status (polled every
   3 minutes) is only used when live status isn't arriving.
-- **Security hold** (`securityHold`, optional; needs homebridge-ecobee-security 0.2.0+ on the same
-  Homebridge): before a start or resume, if ecobee Smart Security is armed **Away** (or arming Away)
-  the plugin has it switched to **Stay**, so the motion sensors don't see the robot. When the cleaning
-  job ends it is armed Away again, with the normal exit delay (mop-wash visits to the dock mid-job
-  don't count as the end). If anyone changes the
-  security system in between (disarm on arriving home, etc.), it's left alone. If the security
-  plugin can't be reached or the alarm is triggered, the start is **refused** (the Home app shows
-  an error) rather than risking a false alarm. Cleans started from the Narwal app are caught when
-  the robot reports the job, a few seconds after it starts. Talks to the security plugin over
-  its Unix socket `<homebridge storage>/ecobee-security/control.sock`.
+- **Security hold** (`securityHold`, optional): when a robot starts cleaning (from the Home app or
+  the Narwal app) and the security system is armed **Away**, it's switched to **Stay**, so the motion
+  sensors don't see the robot. When the job ends (mop-wash visits to the dock mid-job don't count),
+  it goes back to Away with the normal exit delay, once every other robot is done too. If anyone
+  changes the security system in between (disarm on arriving home, etc.), it's left alone. If the
+  security system can't be reached or the alarm is triggered, the start is **refused** (the Home app
+  shows an error) rather than risking a false alarm. By default it talks to
+  [homebridge-ecobee-security](https://github.com/seanfletchr/homebridge-ecobee-security) 0.2.0+ on
+  the same Homebridge; `securityEndpoint` points it at anything else offering the API below.
+
+## Security hold API
+
+Any security system plugin or service can offer the hold, so this plugin (and others) can keep it
+from going off while a robot cleans. `securityEndpoint` is either a **Unix socket path** (for
+another Homebridge plugin; a socket readable only by the homebridge user is the safest choice) or an
+**http(s) URL** the paths below are appended to (basic auth in the URL works).
+
+- `POST <endpoint>/hold?by=<robot name>`: if the system is armed Away (or arming Away), switch it to
+  Stay and remember who asked. Answer 2xx, optionally with JSON
+  `{ "ok": true, "held": true|false, "state": "…" }`. Answer `"ok": false` with a `"reason"` (or any
+  non-2xx status) when cleaning isn't safe, e.g. the alarm is triggered: the robot won't start.
+- `POST <endpoint>/release?by=<robot name>`: the robot's job is done. Arm Away again only if this
+  was the **last** holder and nobody changed the system in between. Answer 2xx, optionally with
+  `{ "released": true|false, "state": "…" }`.
+
+A plain webhook that answers 2xx works too (it's taken as held / released), as long as the other
+side handles several holders. homebridge-ecobee-security implements this at
+`<homebridge storage>/ecobee-security/control.sock`.
