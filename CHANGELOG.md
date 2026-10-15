@@ -12,6 +12,9 @@
   whole job, mop-wash visits to the dock included, and end the moment it does. `dockedMinutes` is
   gone.
 - An idle robot on the dock showed as Stopped instead of Docked.
+- The Home app's **Play Sound to Locate** now plays the robot's locate sound.
+- Consumables: resetting a part's filter indication (Eve and similar apps) resets its counter on
+  the robot, like the Narwal app's reset button.
 
 ## 0.2.0
 

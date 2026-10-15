@@ -96,12 +96,15 @@ setup code); the vacuum keeps its own Matter pairing.
   app such as Eve, Controller for HomeKit or Home+, which show each part. They cover the parts the Narwal app shows a life bar for:
   Filter, Side Brush, Rolling Brushes, Mop and Filter Sponge. Each has its life left (%) and shows
   "replace" once it is at or below `replaceAtPercent` (10 by default). Read from Narwal's cloud
-  hourly and after each clean. Reset a counter in the Narwal app after replacing the part. The
+  hourly and after each clean. After replacing a part, reset its counter from the same app (its
+  "Reset filter" control sends the Narwal app's reset command) or in the Narwal app. The
   app's "clean regularly" reminders (dust bin, base tray, sensors, caster wheel) have no counter
   and aren't shown.
 
 ## How it behaves
 
+- **Play Sound to Locate** in the Home app plays the robot's locate sound (the Narwal app's
+  "Locate robot").
 - **Rooms:** the Freo only sends its saved map (room names) and the app's cleaning plans while the
   **Narwal app is open**. On first start, open the app on the Freo's map for a minute; the vacuum
   is published once the rooms arrive. Rooms and plans are cached in
