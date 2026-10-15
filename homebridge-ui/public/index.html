@@ -1,0 +1,305 @@
+<style>
+  /* Inherit the theme's text colour; Bootstrap's muted grey is unreadable on Homebridge's dark themes. */
+  .hint { opacity: 0.75; font-size: 0.875em; }
+  .modes td, .modes th { vertical-align: middle; }
+  .modes select { min-width: 7em; }
+  .modes select.task { min-width: 11.5em; }
+  .modes .group th { padding-top: 1rem; }
+</style>
+
+<div class="card card-body mb-3">
+  <h5 class="mb-3">Narwal account</h5>
+
+  <div id="signed-in" hidden>
+    <div class="alert alert-success mb-2" role="status" id="signed-in-text">Signed in to Narwal.</div>
+    <div id="robots"></div>
+    <button type="button" class="btn btn-secondary" id="sign-in-again">Sign in again</button>
+  </div>
+
+  <div id="signin" hidden>
+    <p class="hint mb-3" id="signin-hint">Sign in with the account you use in the Narwal app.</p>
+    <form id="signin-form" autocomplete="on">
+      <div class="mb-2">
+        <label for="email" class="form-label">Narwal email</label>
+        <input type="email" class="form-control" id="email" autocomplete="username" required>
+      </div>
+      <div class="mb-2">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" class="form-control" id="password" autocomplete="current-password" required>
+        <div class="hint mt-1">Saved in the plugin settings: Narwal sessions expire, and the plugin signs in again by itself.</div>
+      </div>
+      <div class="mb-3">
+        <label for="region" class="form-label">Narwal cloud region</label>
+        <select class="form-select" id="region">
+          <option value="us">United States / Canada</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Sign in</button>
+      <button type="button" class="btn btn-link" id="sign-in-cancel" hidden>Cancel</button>
+    </form>
+  </div>
+
+  <div id="error" class="alert alert-danger mt-3 mb-0" role="alert" hidden></div>
+</div>
+
+<div class="card card-body mb-3" id="rooms-card" hidden>
+  <h5 class="mb-3">Rooms</h5>
+  <div id="rooms"></div>
+</div>
+
+<div class="card card-body mb-3" id="modes-card" hidden>
+  <h5 class="mb-2">Clean modes</h5>
+  <p class="hint mb-2">The Home app has three buttons, Vacuum, Mop and a combined one (named after its task), each with
+    Automatic, Quick and Deep Clean in its ⋯ menu. Choose what each does. "App" uses the settings saved for each room
+    in the Narwal app.</p>
+  <div class="table-responsive">
+    <table class="table table-sm modes mb-0">
+      <thead>
+        <tr><th>Home app</th><th>Task</th><th>Passes</th><th>Suction</th><th>Water</th></tr>
+      </thead>
+      <tbody id="modes"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+(async () => {
+  const PLATFORM = 'NarwalPlatform';
+  const $ = id => document.getElementById(id);
+
+  const SLOTS = [
+    ['Vacuum', [['vacuum', 'Button / Automatic'], ['vacuumQuick', 'Quick'], ['vacuumDeep', 'Deep Clean']]],
+    ['Mop', [['mop', 'Button / Automatic'], ['mopQuick', 'Quick'], ['mopDeep', 'Deep Clean']]],
+    ['Vacuum + Mop', [['both', 'Button'], ['bothQuick', 'Quick'], ['bothDeep', 'Deep Clean'], ['bothAuto', 'Automatic']]],
+  ];
+  const CHOICES = {
+    task: [['vacuum_and_mop', 'Vacuum and Mop'], ['vacuum_then_mop', 'Vacuum then Mop'], ['freo_mind', 'Freo Mind']],
+    passes: [['app', 'App'], ['1', '1'], ['2', '2'], ['3', '3']],
+    suction: [['app', 'App'], ['quiet', 'Quiet'], ['standard', 'Standard'], ['strong', 'Strong']],
+    water: [['app', 'App'], ['dry', 'Slightly dry'], ['standard', 'Standard'], ['wet', 'Slightly wet']],
+  };
+
+  function showError(message) {
+    $('error').textContent = message;
+    $('error').hidden = !message;
+  }
+
+  async function configBlock() {
+    const blocks = await homebridge.getPluginConfig();
+    return [blocks[0] ?? { platform: PLATFORM, name: 'Freo' }, blocks.slice(1)];
+  }
+
+  async function saveBlock(block, rest) {
+    await homebridge.updatePluginConfig([block, ...rest]);
+  }
+
+  // ── Account ──
+
+  function showRobots(robots, block) {
+    const box = $('robots');
+    box.textContent = '';
+    if (!robots) {
+      return;
+    }
+    if (!robots.length) {
+      box.innerHTML = '<div class="alert alert-warning mb-2">No robots on this Narwal account.</div>';
+      return;
+    }
+    const chosen = robots.find(r => r.serial === block.serialNumber) ?? robots[0];
+    const line = r => `${r.name}, serial ${r.serial}${r.firmware ? `, firmware ${r.firmware}` : ''}`;
+    if (robots.length === 1) {
+      const p = document.createElement('p');
+      p.className = 'mb-2';
+      p.textContent = `Robot: ${line(chosen)}`;
+      box.append(p);
+    } else {
+      const label = document.createElement('label');
+      label.className = 'form-label';
+      label.textContent = 'Robot';
+      const select = document.createElement('select');
+      select.className = 'form-select mb-2';
+      for (const r of robots) {
+        select.append(new Option(line(r), r.serial, false, r === chosen));
+      }
+      select.addEventListener('change', async () => {
+        const [b, rest] = await configBlock();
+        b.serialNumber = select.value;
+        await saveBlock(b, rest);
+      });
+      box.append(label, select);
+    }
+    if (!chosen.supported) {
+      const warn = document.createElement('div');
+      warn.className = 'alert alert-warning mb-2';
+      warn.textContent = 'This doesn\'t look like the original Narwal Freo (YJCC012), the only model this plugin '
+        + 'supports. Newer Narwal robots use different commands and won\'t work.';
+      box.append(warn);
+    }
+  }
+
+  async function showAccount({ signIn = false, robots, justSignedIn = false } = {}) {
+    const [block] = await configBlock();
+    const signedIn = Boolean(block.email && block.password) && !signIn;
+    $('signed-in').hidden = !signedIn;
+    $('signin').hidden = signedIn;
+    $('sign-in-cancel').hidden = !(block.email && block.password);
+    $('signed-in-text').textContent = justSignedIn
+      ? `Signed in as ${block.email}. Save, then restart the bridge this plugin runs on.`
+      : `Signed in as ${block.email ?? ''}.`;
+    $('email').value = block.email ?? '';
+    $('region').value = block.region ?? 'us';
+    showRobots(robots, block);
+    $('rooms-card').hidden = !signedIn;
+    $('modes-card').hidden = !signedIn;
+  }
+
+  $('signin-form').addEventListener('submit', async event => {
+    event.preventDefault();
+    showError('');
+    homebridge.showSpinner();
+    let result;
+    try {
+      result = await homebridge.request('/sign-in', {
+        email: $('email').value, password: $('password').value, region: $('region').value,
+      });
+    } catch (error) {
+      showError(error.message || 'Sign-in failed.');
+    } finally {
+      homebridge.hideSpinner();
+    }
+    if (!result) {
+      return;
+    }
+    const [block, rest] = await configBlock();
+    block.email = $('email').value.trim();
+    block.password = $('password').value;
+    block.region = $('region').value;
+    if (result.robots.length === 1 || !result.robots.some(r => r.serial === block.serialNumber)) {
+      delete block.serialNumber;
+    }
+    $('password').value = '';
+    await saveBlock(block, rest);
+    homebridge.toast.success('Signed in to Narwal. Save to keep it.');
+    await showAccount({ robots: result.robots, justSignedIn: true });
+  });
+
+  $('sign-in-again').addEventListener('click', () => {
+    showError('');
+    showAccount({ signIn: true });
+    $('password').focus();
+  });
+
+  $('sign-in-cancel').addEventListener('click', () => {
+    showError('');
+    $('password').value = '';
+    showAccount();
+  });
+
+  // ── Rooms ──
+
+  async function showRooms() {
+    const status = await homebridge.request('/status').catch(() => ({ started: false, rooms: [] }));
+    const box = $('rooms');
+    box.textContent = '';
+    const p = document.createElement('p');
+    p.className = 'mb-0';
+    if (status.rooms.length) {
+      p.textContent = status.rooms.join(', ');
+      const hint = document.createElement('p');
+      hint.className = 'hint mt-2 mb-0';
+      hint.textContent = 'Changed rooms in the Narwal app? Open the app on the robot\'s map for a minute; the plugin picks '
+        + 'up the new list within 6 hours.';
+      box.append(p, hint);
+    } else {
+      p.className = 'alert alert-info mb-0';
+      p.textContent = status.started
+        ? 'Waiting for the room list. Open the Narwal app on the robot\'s map for a minute: the robot only sends its '
+          + 'rooms while the app is open. The vacuum appears in Homebridge once they arrive.'
+        : 'Save and restart the bridge; then open the Narwal app on the robot\'s map for a minute so the robot sends '
+          + 'its rooms.';
+      box.append(p);
+    }
+  }
+
+  // ── Clean modes ──
+
+  const defaults = await homebridge.request('/clean-mode-defaults');
+
+  function select(field, value, onChange) {
+    const s = document.createElement('select');
+    s.className = `form-select form-select-sm ${field}`;
+    for (const [v, label] of CHOICES[field]) {
+      s.append(new Option(label, v, false, v === value));
+    }
+    s.addEventListener('change', () => onChange(s.value));
+    return s;
+  }
+
+  async function showModes() {
+    const [block] = await configBlock();
+    const body = $('modes');
+    body.textContent = '';
+    for (const [group, slots] of SLOTS) {
+      const head = document.createElement('tr');
+      head.className = 'group';
+      head.innerHTML = `<th colspan="5"></th>`;
+      head.firstChild.textContent = group;
+      body.append(head);
+      for (const [key, label] of slots) {
+        const value = { ...defaults[key], ...block.cleanModes?.[key] };
+        const row = document.createElement('tr');
+        const cells = ['label', 'task', 'passes', 'suction', 'water'].map(() => document.createElement('td'));
+        cells[0].textContent = label;
+        const mind = value.task === 'freo_mind';
+        for (const [i, field] of [[1, 'task'], [2, 'passes'], [3, 'suction'], [4, 'water']]) {
+          const applies = field === 'task' ? key.startsWith('both')
+            : !mind && !(field === 'suction' && key.startsWith('mop')) && !(field === 'water' && key.startsWith('vacuum'));
+          if (applies) {
+            cells[i].append(select(field, value[field] ?? (field === 'task' ? 'vacuum_and_mop' : 'app'),
+              v => setMode(key, field, v)));
+          } else {
+            cells[i].textContent = field === 'task' ? (key.startsWith('vacuum') ? 'Vacuum' : 'Mop')
+              : mind ? 'Robot decides' : '—';
+            cells[i].className = 'hint';
+          }
+        }
+        row.append(...cells);
+        body.append(row);
+      }
+    }
+  }
+
+  /** Store only what differs from the defaults, so a slot left alone follows future defaults. */
+  async function setMode(key, field, value) {
+    const [block, rest] = await configBlock();
+    const slot = { ...defaults[key], ...block.cleanModes?.[key], [field]: value };
+    const changed = Object.fromEntries(Object.entries(slot).filter(([f, v]) => v !== (defaults[key][f] ?? 'app')));
+    const modes = { ...block.cleanModes };
+    if (Object.keys(changed).length) {
+      modes[key] = changed;
+    } else {
+      delete modes[key];
+    }
+    if (Object.keys(modes).length) {
+      block.cleanModes = modes;
+    } else {
+      delete block.cleanModes;
+    }
+    await saveBlock(block, rest);
+    if (field === 'task') {
+      await showModes();
+    }
+  }
+
+  await showAccount();
+  const [saved] = await configBlock();
+  if (saved.email && saved.password) {
+    // Check the saved sign-in and show the robot.
+    homebridge.request('/sign-in', { email: saved.email, password: saved.password, region: saved.region })
+      .then(result => showAccount({ robots: result.robots }))
+      .catch(error => showError(`The saved Narwal sign-in didn't work: ${error.message}. Sign in again.`));
+  }
+  await Promise.all([showRooms(), showModes()]);
+  homebridge.showSchemaForm();
+})();
+</script>

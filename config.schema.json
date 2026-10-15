@@ -5,10 +5,6 @@
   "headerDisplay": "Shows the original Narwal Freo (model YJCC012) as a native robot vacuum in Apple Home (Matter). Needs Matter enabled for this plugin's child bridge. Unofficial: uses the same Narwal cloud as the app. Newer Narwal models are not supported.",
   "schema": {
     "type": "object",
-    "required": [
-      "email",
-      "password"
-    ],
     "properties": {
       "name": {
         "title": "Name",
@@ -19,14 +15,16 @@
       "email": {
         "title": "Narwal account email",
         "type": "string",
-        "format": "email"
+        "format": "email",
+        "description": "Set by signing in above."
       },
       "password": {
         "title": "Narwal account password",
         "type": "string",
         "x-schema-form": {
           "type": "password"
-        }
+        },
+        "description": "Set by signing in above."
       },
       "cleanModes": {
         "type": "object",
@@ -1037,7 +1035,7 @@
       "serialNumber": {
         "title": "Robot serial number",
         "type": "string",
-        "description": "Only needed if the account has more than one robot."
+        "description": "Only needed if the account has more than one robot; pick it above."
       },
       "cleaningSensor": {
         "title": "Cleaning sensor",
@@ -1085,240 +1083,16 @@
   },
   "layout": [
     "name",
-    "email",
-    {
-      "key": "password",
-      "type": "password"
-    },
-    "serialNumber",
-    {
-      "type": "fieldset",
-      "title": "Clean modes: Vacuum",
-      "description": "The Home app's Vacuum button and its ⋯ menu (Automatic, Quick, Deep Clean). \"Narwal app settings\" uses the per-room settings saved in the Narwal app.",
-      "expandable": true,
-      "expanded": false,
-      "items": [
-        {
-          "type": "fieldset",
-          "title": "Vacuum (button / Automatic)",
-          "items": [
-            {
-              "key": "cleanModes.vacuum.passes"
-            },
-            {
-              "key": "cleanModes.vacuum.suction"
-            }
-          ]
-        },
-        {
-          "type": "fieldset",
-          "title": "Vacuum: Quick",
-          "items": [
-            {
-              "key": "cleanModes.vacuumQuick.passes"
-            },
-            {
-              "key": "cleanModes.vacuumQuick.suction"
-            }
-          ]
-        },
-        {
-          "type": "fieldset",
-          "title": "Vacuum: Deep Clean",
-          "items": [
-            {
-              "key": "cleanModes.vacuumDeep.passes"
-            },
-            {
-              "key": "cleanModes.vacuumDeep.suction"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "fieldset",
-      "title": "Clean modes: Mop",
-      "description": "The Home app's Mop button and its ⋯ menu.",
-      "expandable": true,
-      "expanded": false,
-      "items": [
-        {
-          "type": "fieldset",
-          "title": "Mop (button / Automatic)",
-          "items": [
-            {
-              "key": "cleanModes.mop.passes"
-            },
-            {
-              "key": "cleanModes.mop.water"
-            }
-          ]
-        },
-        {
-          "type": "fieldset",
-          "title": "Mop: Quick",
-          "items": [
-            {
-              "key": "cleanModes.mopQuick.passes"
-            },
-            {
-              "key": "cleanModes.mopQuick.water"
-            }
-          ]
-        },
-        {
-          "type": "fieldset",
-          "title": "Mop: Deep Clean",
-          "items": [
-            {
-              "key": "cleanModes.mopDeep.passes"
-            },
-            {
-              "key": "cleanModes.mopDeep.water"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "fieldset",
-      "title": "Clean modes: Vacuum + Mop",
-      "description": "The Home app's combined button and its ⋯ menu. The Home app names this button after the task chosen for it.",
-      "expandable": true,
-      "expanded": false,
-      "items": [
-        {
-          "type": "fieldset",
-          "title": "Vacuum + Mop (button)",
-          "items": [
-            {
-              "key": "cleanModes.both.task"
-            },
-            {
-              "key": "cleanModes.both.passes",
-              "condition": {
-                "functionBody": "return (model.cleanModes?.both?.task ?? 'vacuum_and_mop') !== 'freo_mind';"
-              }
-            },
-            {
-              "key": "cleanModes.both.suction",
-              "condition": {
-                "functionBody": "return (model.cleanModes?.both?.task ?? 'vacuum_and_mop') !== 'freo_mind';"
-              }
-            },
-            {
-              "key": "cleanModes.both.water",
-              "condition": {
-                "functionBody": "return (model.cleanModes?.both?.task ?? 'vacuum_and_mop') !== 'freo_mind';"
-              }
-            }
-          ]
-        },
-        {
-          "type": "fieldset",
-          "title": "Vacuum + Mop: Quick",
-          "items": [
-            {
-              "key": "cleanModes.bothQuick.task"
-            },
-            {
-              "key": "cleanModes.bothQuick.passes",
-              "condition": {
-                "functionBody": "return (model.cleanModes?.bothQuick?.task ?? 'vacuum_and_mop') !== 'freo_mind';"
-              }
-            },
-            {
-              "key": "cleanModes.bothQuick.suction",
-              "condition": {
-                "functionBody": "return (model.cleanModes?.bothQuick?.task ?? 'vacuum_and_mop') !== 'freo_mind';"
-              }
-            },
-            {
-              "key": "cleanModes.bothQuick.water",
-              "condition": {
-                "functionBody": "return (model.cleanModes?.bothQuick?.task ?? 'vacuum_and_mop') !== 'freo_mind';"
-              }
-            }
-          ]
-        },
-        {
-          "type": "fieldset",
-          "title": "Vacuum + Mop: Deep Clean",
-          "items": [
-            {
-              "key": "cleanModes.bothDeep.task"
-            },
-            {
-              "key": "cleanModes.bothDeep.passes",
-              "condition": {
-                "functionBody": "return (model.cleanModes?.bothDeep?.task ?? 'vacuum_then_mop') !== 'freo_mind';"
-              }
-            },
-            {
-              "key": "cleanModes.bothDeep.suction",
-              "condition": {
-                "functionBody": "return (model.cleanModes?.bothDeep?.task ?? 'vacuum_then_mop') !== 'freo_mind';"
-              }
-            },
-            {
-              "key": "cleanModes.bothDeep.water",
-              "condition": {
-                "functionBody": "return (model.cleanModes?.bothDeep?.task ?? 'vacuum_then_mop') !== 'freo_mind';"
-              }
-            }
-          ]
-        },
-        {
-          "type": "fieldset",
-          "title": "Vacuum + Mop: Automatic",
-          "items": [
-            {
-              "key": "cleanModes.bothAuto.task"
-            },
-            {
-              "key": "cleanModes.bothAuto.passes",
-              "condition": {
-                "functionBody": "return (model.cleanModes?.bothAuto?.task ?? 'freo_mind') !== 'freo_mind';"
-              }
-            },
-            {
-              "key": "cleanModes.bothAuto.suction",
-              "condition": {
-                "functionBody": "return (model.cleanModes?.bothAuto?.task ?? 'freo_mind') !== 'freo_mind';"
-              }
-            },
-            {
-              "key": "cleanModes.bothAuto.water",
-              "condition": {
-                "functionBody": "return (model.cleanModes?.bothAuto?.task ?? 'freo_mind') !== 'freo_mind';"
-              }
-            }
-          ]
-        }
-      ]
-    },
     "defaultCleanMode",
+    "cleaningSensor",
+    "consumables",
     {
-      "type": "fieldset",
-      "title": "Extra accessories",
-      "expandable": true,
-      "expanded": false,
-      "items": [
-        "cleaningSensor",
-        "consumables",
-        "replaceAtPercent"
-      ]
+      "key": "replaceAtPercent",
+      "condition": {
+        "functionBody": "return model.consumables === true;"
+      }
     },
-    {
-      "type": "fieldset",
-      "title": "ecobee Smart Security",
-      "expandable": true,
-      "expanded": false,
-      "items": [
-        "securityHold"
-      ]
-    },
-    "region"
-  ]
+    "securityHold"
+  ],
+  "customUi": true
 }

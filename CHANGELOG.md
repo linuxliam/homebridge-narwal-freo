@@ -2,6 +2,8 @@
 
 ## 0.3.0
 
+- New settings page, laid out like homebridge-ecobee-security's: sign in to Narwal (checked straight
+  away, shows the robot), the room list or what to do to get it, and the clean modes as one table.
 - `cleanModes`: choose what each Home app clean mode does: passes, suction and water level for
   every Vacuum / Mop / Vacuum + Mop slot, and the task (Vacuum and Mop, Vacuum then Mop, Freo Mind)
   for the combined ones. The settings page groups them per Home app button.

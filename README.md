@@ -24,6 +24,16 @@ Message formats come from the MIT-licensed Home Assistant integrations
 
 ## Config
 
+Set it up from the plugin's settings page in the Homebridge UI:
+
+- **Narwal account:** sign in with the email and password you use in the Narwal app. The page checks
+  them with Narwal straight away and shows the robot it found (pick one if the account has several).
+- **Rooms:** the room list the plugin has received, or what to do to get it.
+- **Clean modes:** what each Home app clean mode does (see below).
+- Below those: name, the cleaning sensor and consumables, and the ecobee security hold.
+
+The same settings in `config.json`:
+
 ```json
 {
   "platform": "NarwalPlatform",
