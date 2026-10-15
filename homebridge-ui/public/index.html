@@ -142,15 +142,20 @@
         }
         return entry;
       });
-      for (const k of [...LEGACY_KEYS, 'serialNumber']) {
-        delete block[k];
-      }
       if (legacy) {
         block.name = 'Narwal Freo';
       }
     } else {
       for (const r of robots) {
         robotEntry(block, r.serial);
+      }
+    }
+    // With `robots`, the plugin ignores the old top-level settings; clear them. The Homebridge UI
+    // merges top-level keys into the saved config, so a deleted key would come back; an undefined one
+    // is dropped when the config is saved.
+    for (const k of [...LEGACY_KEYS, 'serialNumber', 'dockedMinutes', 'securityReleaseMinutes', 'simpleModes']) {
+      if (k in block) {
+        block[k] = undefined;
       }
     }
   }
@@ -409,7 +414,7 @@
 
   $('security-endpoint').addEventListener('change', () => edit(block => {
     const value = $('security-endpoint').value.trim();
-    if (value) { block.securityEndpoint = value; } else { delete block.securityEndpoint; }
+    block.securityEndpoint = value || undefined;
   }));
 
   // ── Start ──
