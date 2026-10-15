@@ -111,7 +111,7 @@
         "title": "Consumables",
         "type": "boolean",
         "default": false,
-        "description": "Shows the remaining life of the filter, side brush, rolling brushes, mops and filter sponge, as listed in the Narwal app's maintenance page. Updated hourly and after each clean."
+        "description": "Remaining life of the filter, side brush, rolling brushes, mops and filter sponge, as in the Narwal app's maintenance page (updated hourly and after each clean). Apple's Home app doesn't display these; use a third-party HomeKit app such as Eve or Controller."
       },
       "replaceAtPercent": {
         "title": "Show \"replace\" at (% life left)",

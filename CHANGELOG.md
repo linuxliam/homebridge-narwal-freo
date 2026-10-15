@@ -6,7 +6,8 @@
 - `cleaningSensor`: an occupancy sensor that's Detected while the robot is away from the dock, for
   Home app automations (the Home app can't trigger on a robot vacuum).
 - `consumables`: remaining life of the filter, side brush, rolling brushes, mops and filter sponge
-  as Filter Maintenance services, with "replace" at `replaceAtPercent`.
+  as Filter Maintenance services, with "replace" at `replaceAtPercent`. Shown by apps such as Eve
+  and Controller; Apple's Home app doesn't display them.
 - `dockedMinutes` replaces `securityReleaseMinutes` (still read if set) and is shared by the
   cleaning sensor and the security hold.
 

@@ -76,7 +76,9 @@ setup code); the vacuum keeps its own Matter pairing.
   away from the dock and clears once it has stayed on the dock for `dockedMinutes` (10 by default;
   the Freo goes back mid-clean to wash its mops). Use it to trigger automations ("when Freo
   Cleaning detects occupancy…").
-- **`consumables`:** one Filter Maintenance service per part the Narwal app shows a life bar for:
+- **`consumables`:** one Filter Maintenance service per part, linked to the Cleaning sensor. **Apple's Home
+  app doesn't display these** (it only shows filter life on air purifiers); use a third-party HomeKit
+  app such as Eve, Controller for HomeKit or Home+, which show each part. They cover the parts the Narwal app shows a life bar for:
   Filter, Side Brush, Rolling Brushes, Mop and Filter Sponge. Each has its life left (%) and shows
   "replace" once it is at or below `replaceAtPercent` (10 by default). Read from Narwal's cloud
   hourly and after each clean. Reset a counter in the Narwal app after replacing the part. The
