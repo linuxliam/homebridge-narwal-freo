@@ -87,10 +87,10 @@ published as a regular HomeKit accessory on the same child bridge. **Pair the ch
 Home app too** when you turn either on (Homebridge UI > Bridges > the plugin's bridge shows its
 setup code); the vacuum keeps its own Matter pairing.
 
-- **`cleaningSensor`:** an occupancy sensor, "Freo Cleaning", that shows Detected while the robot is
-  away from the dock and clears once it has stayed on the dock for `dockedMinutes` (10 by default;
-  the Freo goes back mid-clean to wash its mops). Use it to trigger automations ("when Freo
-  Cleaning detects occupancy…").
+- **`cleaningSensor`:** an occupancy sensor, "Freo Cleaning", that shows Detected for the whole
+  cleaning job: from the moment the robot starts until the job ends, including its trips back to
+  the dock to wash the mops mid-job (the robot reports the job itself, so there's no guessing from
+  dock time). Use it to trigger automations ("when Freo Cleaning detects occupancy…").
 - **`consumables`:** one Filter Maintenance service per part, linked to the Cleaning sensor. **Apple's Home
   app doesn't display these** (it only shows filter life on air purifiers); use a third-party HomeKit
   app such as Eve, Controller for HomeKit or Home+, which show each part. They cover the parts the Narwal app shows a life bar for:
@@ -123,11 +123,11 @@ setup code); the vacuum keeps its own Matter pairing.
   3 minutes) is only used when live status isn't arriving.
 - **Security hold** (`securityHold`, optional; needs homebridge-ecobee-security 0.2.0+ on the same
   Homebridge): before a start or resume, if ecobee Smart Security is armed **Away** (or arming Away)
-  the plugin has it switched to **Stay**, so the motion sensors don't see the robot. Once the robot
-  has been back on the dock for `dockedMinutes` (10 by default — longer than its mop-wash
-  visits mid-clean) it is armed Away again, with the normal exit delay. If anyone changes the
+  the plugin has it switched to **Stay**, so the motion sensors don't see the robot. When the cleaning
+  job ends it is armed Away again, with the normal exit delay (mop-wash visits to the dock mid-job
+  don't count as the end). If anyone changes the
   security system in between (disarm on arriving home, etc.), it's left alone. If the security
   plugin can't be reached or the alarm is triggered, the start is **refused** (the Home app shows
   an error) rather than risking a false alarm. Cleans started from the Narwal app are caught when
-  the robot reports them, a few seconds after it leaves the dock. Talks to the security plugin over
+  the robot reports the job, a few seconds after it starts. Talks to the security plugin over
   its Unix socket `<homebridge storage>/ecobee-security/control.sock`.

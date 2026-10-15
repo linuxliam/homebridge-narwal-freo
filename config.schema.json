@@ -1014,7 +1014,7 @@
         "title": "Cleaning sensor",
         "type": "boolean",
         "default": false,
-        "description": "Adds an occupancy sensor that shows Detected while the robot is away from the dock, so Home app automations can react to cleaning (the Home app can't trigger on the vacuum itself). Needs this child bridge paired in the Home app as well."
+        "description": "Adds an occupancy sensor that shows Detected while the robot is on a cleaning job (from leaving the dock until the job ends, mop-wash visits to the dock included), so Home app automations can react to cleaning (the Home app can't trigger on the vacuum itself). Needs this child bridge paired in the Home app as well."
       },
       "consumables": {
         "title": "Consumables",
@@ -1032,18 +1032,11 @@
           "functionBody": "return model.consumables === true;"
         }
       },
-      "dockedMinutes": {
-        "title": "Cleaning finished after (minutes on the dock)",
-        "type": "integer",
-        "default": 10,
-        "minimum": 1,
-        "description": "The Freo returns to the base mid-clean to wash its mops; this must be longer than those visits. Used by the cleaning sensor and the security hold."
-      },
       "securityHold": {
         "title": "Switch ecobee security from Away to Stay while cleaning",
         "type": "boolean",
         "default": false,
-        "description": "Needs homebridge-ecobee-security 0.2.0+ on this Homebridge. Before the robot sets off, an Away system is switched to Stay (so the motion sensors don't trigger it); once cleaning has finished (minutes on the dock, above) it goes back to Away. If the security system can't be reached, the clean is refused."
+        "description": "Needs homebridge-ecobee-security 0.2.0+ on this Homebridge. When a cleaning job starts, an Away system is switched to Stay (so the motion sensors don't trigger it); when the job ends it goes back to Away. If the security system can't be reached, the clean is refused."
       },
       "region": {
         "title": "Narwal cloud region",
@@ -1284,8 +1277,7 @@
       "items": [
         "cleaningSensor",
         "consumables",
-        "replaceAtPercent",
-        "dockedMinutes"
+        "replaceAtPercent"
       ]
     },
     {
