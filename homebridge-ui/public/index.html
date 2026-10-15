@@ -82,9 +82,6 @@
     suction: [['app', 'App'], ['quiet', 'Quiet'], ['standard', 'Standard'], ['strong', 'Strong']],
     water: [['app', 'App'], ['dry', 'Slightly dry'], ['standard', 'Standard'], ['wet', 'Slightly wet']],
   };
-  const SLOT_NAMES = Object.fromEntries(GROUPS.flatMap(([group, slots]) =>
-    slots.map(([key, label]) => [key, `${group}: ${label}`])));
-
   const el = (tag, props = {}, ...children) => {
     const node = Object.assign(document.createElement(tag), props);
     node.append(...children);
@@ -358,16 +355,6 @@
       modes.append(modeGroup(serial, entry, g));
     }
     settings.append(modes);
-
-    const first = el('select', { className: 'form-select' });
-    for (const [key, label] of Object.entries(SLOT_NAMES)) {
-      first.append(new Option(label, key, false, key === (entry.defaultCleanMode ?? 'both')));
-    }
-    first.addEventListener('change', () => setRobot(serial, e => {
-      if (first.value === 'both') { delete e.defaultCleanMode; } else { e.defaultCleanMode = first.value; }
-    }));
-    settings.append(el('div', { className: 'mb-3' },
-      el('label', { className: 'form-label', textContent: 'Clean mode before one is picked in the Home app' }), first));
 
     const replace = el('input', { className: 'form-control', type: 'number', min: 0, max: 100, value: entry.replaceAtPercent ?? 10 });
     replace.addEventListener('change', () => setRobot(serial, e => { e.replaceAtPercent = Number(replace.value); }));

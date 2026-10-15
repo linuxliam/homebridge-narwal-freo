@@ -16,7 +16,9 @@
   for the combined ones. The settings page groups them per Home app button.
 - Narwal's one-pass **Vacuum and Mop** is now offered and is the default for the combined button
   and its Quick mode; Deep Clean stays Vacuum then Mop with 2 passes each, Automatic stays Freo Mind.
-- `defaultCleanMode` now names a slot (`both`, `vacuumQuick`, …); the old values still work.
+- `defaultCleanMode` is no longer in the settings (it only chose the mode for a robot's very first start,
+  before a mode is picked in the Home app); configs that set it still work, with slot names (`both`,
+  `vacuumQuick`, …) or the old values.
 - The robot's own job state drives the cleaning sensor and the security hold: they follow the
   whole job, mop-wash visits to the dock included, and end the moment it does. `dockedMinutes` is
   gone.
