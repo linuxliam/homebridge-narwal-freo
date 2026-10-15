@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { HomebridgePluginUiServer, RequestError } from '@homebridge/plugin-ui-utils';
 
 import { NarwalCloud } from '../lib/cloud.js';
+import { findSecurityProviders } from '../lib/security-providers.js';
 import { DEFAULT_CLEAN_MODES } from '../lib/vacuum.js';
 
 // Product ID of the original Freo (YJCC012), the only model this plugin supports.
@@ -42,6 +43,10 @@ class UiServer extends HomebridgePluginUiServer {
     });
 
     this.onRequest('/clean-mode-defaults', () => DEFAULT_CLEAN_MODES);
+
+    // Installed plugins that offer the security hold (names only; the plugin finds their sockets itself).
+    this.onRequest('/security-providers', () =>
+      findSecurityProviders(this.homebridgeStoragePath).map(({ name, displayName }) => ({ name, displayName })));
 
     // What the running plugin has saved: each robot's rooms, by device ID (no tokens leave this process).
     this.onRequest('/status', async () => {

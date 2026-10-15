@@ -5,10 +5,11 @@
 - **Several robots:** a `robots` list, each robot with its own name, clean modes, cleaning sensor and
   consumables, published as its own Matter vacuum. Configs from 0.2.x still work, and the settings
   page moves them into the list (the robot keeps its Matter pairing).
-- **Security hold for any security system:** `securityEndpoint` points the hold at a Unix socket or
-  an http(s) URL offering the documented hold API (README); empty means homebridge-ecobee-security.
-  With several robots, Away comes back when the last one is done (needs a security side that
-  tracks holders, like homebridge-ecobee-security after 0.4.2).
+- **Security hold for any security system:** security plugins declare the hold in their
+  package.json (`"homebridge-security-hold": { "socket": … }`, see the README); the settings page
+  lists the installed ones (`securityPlugin`), or `securityEndpoint` points at a socket or http(s)
+  URL. No security plugin is preferred any more. With several robots, Away comes back when the last
+  one is done.
 - New settings page, laid out like homebridge-ecobee-security's: sign in to Narwal (checked straight
   away), then a card per robot with its rooms and collapsible clean-mode tables, and the security hold.
 - `cleanModes`: choose what each Home app clean mode does: passes, suction and water level for

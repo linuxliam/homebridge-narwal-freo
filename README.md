@@ -46,6 +46,7 @@ The same settings in `config.json`:
     { "serialNumber": "YA4…", "name": "Upstairs", "cleanModes": { "both": { "task": "vacuum_then_mop" } } }
   ],
   "securityHold": true,
+  "securityPlugin": "homebridge-example-security",
   "_bridge": {
     "username": "…",
     "port": 51916,
@@ -144,17 +145,27 @@ setup code); the vacuum keeps its own Matter pairing.
   it goes back to Away with the normal exit delay, once every other robot is done too. If anyone
   changes the security system in between (disarm on arriving home, etc.), it's left alone. If the
   security system can't be reached or the alarm is triggered, the start is **refused** (the Home app
-  shows an error) rather than risking a false alarm. By default it talks to
-  [homebridge-ecobee-security](https://github.com/seanfletchr/homebridge-ecobee-security) on the
-  same Homebridge (0.5.0+ with **Allow security holds** turned on; 0.2.0–0.4.x always allowed it, but
-  can't track two robots); `securityEndpoint` points it at anything else offering the API below.
+  shows an error) rather than risking a false alarm. It works with any security system plugin that
+  offers the hold (the settings page lists the installed ones; `securityPlugin`), or with any other
+  service via `securityEndpoint`; see the API below.
 
 ## Security hold API
 
-Any security system plugin or service can offer the hold, so this plugin (and others) can keep it
-from going off while a robot cleans. `securityEndpoint` is either a **Unix socket path** (for
-another Homebridge plugin; a socket readable only by the homebridge user is the safest choice) or an
-**http(s) URL** the paths below are appended to (basic auth in the URL works).
+Any security system plugin or service can offer the hold, so robot vacuum plugins (this one, and
+others that want to) can keep it from going off while a robot cleans.
+
+**For a Homebridge plugin:** serve the API on a Unix socket in the Homebridge storage folder (readable
+only by the homebridge user) and declare it in your `package.json`, with the path relative to the
+storage folder:
+
+```json
+"homebridge-security-hold": { "socket": "my-security/control.sock" }
+```
+
+This plugin's settings page lists every installed plugin that declares it, and the plugin finds the
+socket from there (`securityPlugin` holds the package name). **For anything else** (a home automation
+hub, a webhook): enter an http(s) URL as `securityEndpoint`; the paths below are appended to it, and
+basic auth in the URL works. A socket path works there too.
 
 - `POST <endpoint>/hold?by=<robot name>`: if the system is armed Away (or arming Away), switch it to
   Stay and remember who asked. Answer 2xx, optionally with JSON
@@ -165,5 +176,4 @@ another Homebridge plugin; a socket readable only by the homebridge user is the 
   `{ "released": true|false, "state": "…" }`.
 
 A plain webhook that answers 2xx works too (it's taken as held / released), as long as the other
-side handles several holders. homebridge-ecobee-security implements this at
-`<homebridge storage>/ecobee-security/control.sock`.
+side handles several holders.

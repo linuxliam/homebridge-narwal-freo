@@ -998,10 +998,15 @@
         "default": false,
         "description": "When a robot starts cleaning and the security system is armed Away, it's switched to Stay (so the motion sensors don't trigger it); when the job ends, and every other robot is done too, it goes back to Away. If the security system can't be reached, the clean is refused."
       },
+      "securityPlugin": {
+        "title": "Security system plugin",
+        "type": "string",
+        "description": "Package name of an installed plugin that offers the security hold (the settings page lists them). If empty and exactly one installed plugin offers it, that one is used."
+      },
       "securityEndpoint": {
         "title": "Security hold endpoint",
         "type": "string",
-        "description": "Unix socket path or http(s) URL of a security system offering the security hold API (see the README). Leave empty for homebridge-ecobee-security 0.2.0+ on this Homebridge."
+        "description": "Instead of a plugin: the Unix socket path or http(s) URL of a security system offering the security hold API (see the README)."
       }
     }
   },

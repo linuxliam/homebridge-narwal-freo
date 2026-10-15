@@ -55,12 +55,16 @@
   <p class="hint mb-2">When a robot starts cleaning and the security system is armed Away, it's switched to Stay, so
     the motion sensors don't see the robot; when the job ends (and every other robot is done too) it goes back to
     Away. If the security system can't be reached, the clean is refused rather than risking a false alarm.</p>
-  <div id="security-endpoint-box" hidden>
-    <label for="security-endpoint" class="form-label">Security hold endpoint</label>
-    <input type="text" class="form-control" id="security-endpoint" placeholder="homebridge-ecobee-security (on this Homebridge)">
-    <div class="hint mt-1">Leave empty for homebridge-ecobee-security 0.2.0 or newer. Other security plugins or
-      services can offer the same hold API (see "Security hold API" in the plugin's README): enter a Unix socket
-      path or an http(s) URL.</div>
+  <div id="security-provider-box" hidden>
+    <label for="security-provider" class="form-label">Security system</label>
+    <select class="form-select" id="security-provider"></select>
+    <div class="hint mt-1" id="security-provider-hint"></div>
+    <div class="mt-2" id="security-endpoint-box" hidden>
+      <label for="security-endpoint" class="form-label">Endpoint</label>
+      <input type="text" class="form-control" id="security-endpoint" placeholder="/path/to/control.sock or https://…">
+      <div class="hint mt-1">A Unix socket path or an http(s) URL offering the security hold API described in the
+        plugin's README.</div>
+    </div>
   </div>
 </div>
 
@@ -399,23 +403,60 @@
 
   // ── Security ──
 
+  const OTHER = '__other__';
+  const providers = await homebridge.request('/security-providers').catch(() => []);
+
   async function showSecurity() {
     const [block] = await configBlock();
+    const select = $('security-provider');
+    select.textContent = '';
+    for (const p of providers) {
+      select.append(new Option(p.displayName === p.name ? p.name : `${p.displayName} (${p.name})`, p.name));
+    }
+    // A chosen plugin that isn't installed (any more) stays visible, so it isn't silently replaced.
+    if (block.securityPlugin && !providers.some(p => p.name === block.securityPlugin)) {
+      select.append(new Option(`${block.securityPlugin} (not installed)`, block.securityPlugin));
+    }
+    select.append(new Option('Other (enter an endpoint)', OTHER));
+    select.value = block.securityEndpoint ? OTHER : block.securityPlugin ?? providers[0]?.name ?? OTHER;
     $('security-hold').checked = Boolean(block.securityHold);
     $('security-endpoint').value = block.securityEndpoint ?? '';
-    $('security-endpoint-box').hidden = !block.securityHold;
+    $('security-provider-hint').textContent = providers.length
+      ? 'Installed plugins that offer the security hold.'
+      : 'No installed plugin offers the security hold. Install one that does (its README will say so), or enter an endpoint.';
+    showSecurityFields();
+  }
+
+  function showSecurityFields() {
+    $('security-provider-box').hidden = !$('security-hold').checked;
+    $('security-endpoint-box').hidden = $('security-provider').value !== OTHER;
+  }
+
+  /** Save the choice: a plugin's package name, or a custom endpoint. */
+  function saveProvider(block) {
+    const choice = $('security-provider').value;
+    const endpoint = $('security-endpoint').value.trim();
+    // Top-level keys: set to undefined rather than deleted, as the Homebridge UI merges them.
+    block.securityPlugin = choice === OTHER ? undefined : choice;
+    block.securityEndpoint = choice === OTHER && endpoint ? endpoint : undefined;
   }
 
   $('security-hold').addEventListener('change', async () => {
-    const on = $('security-hold').checked;
-    $('security-endpoint-box').hidden = !on;
-    await edit(block => { block.securityHold = on; });
+    showSecurityFields();
+    await edit(block => {
+      block.securityHold = $('security-hold').checked;
+      if (block.securityHold) {
+        saveProvider(block);
+      }
+    });
   });
 
-  $('security-endpoint').addEventListener('change', () => edit(block => {
-    const value = $('security-endpoint').value.trim();
-    block.securityEndpoint = value || undefined;
-  }));
+  $('security-provider').addEventListener('change', async () => {
+    showSecurityFields();
+    await edit(saveProvider);
+  });
+
+  $('security-endpoint').addEventListener('change', () => edit(saveProvider));
 
   // ── Start ──
 
