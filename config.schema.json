@@ -28,73 +28,982 @@
           "type": "password"
         }
       },
+      "cleanModes": {
+        "type": "object",
+        "title": "Clean modes",
+        "properties": {
+          "vacuum": {
+            "type": "object",
+            "title": "Vacuum (button / Automatic)",
+            "properties": {
+              "passes": {
+                "type": "string",
+                "title": "Passes",
+                "default": "app",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "1 pass",
+                    "enum": [
+                      "1"
+                    ]
+                  },
+                  {
+                    "title": "2 passes",
+                    "enum": [
+                      "2"
+                    ]
+                  },
+                  {
+                    "title": "3 passes",
+                    "enum": [
+                      "3"
+                    ]
+                  }
+                ]
+              },
+              "suction": {
+                "type": "string",
+                "title": "Suction",
+                "default": "app",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "Quiet",
+                    "enum": [
+                      "quiet"
+                    ]
+                  },
+                  {
+                    "title": "Standard",
+                    "enum": [
+                      "standard"
+                    ]
+                  },
+                  {
+                    "title": "Strong",
+                    "enum": [
+                      "strong"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "vacuumQuick": {
+            "type": "object",
+            "title": "Vacuum: Quick",
+            "properties": {
+              "passes": {
+                "type": "string",
+                "title": "Passes",
+                "default": "1",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "1 pass",
+                    "enum": [
+                      "1"
+                    ]
+                  },
+                  {
+                    "title": "2 passes",
+                    "enum": [
+                      "2"
+                    ]
+                  },
+                  {
+                    "title": "3 passes",
+                    "enum": [
+                      "3"
+                    ]
+                  }
+                ]
+              },
+              "suction": {
+                "type": "string",
+                "title": "Suction",
+                "default": "app",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "Quiet",
+                    "enum": [
+                      "quiet"
+                    ]
+                  },
+                  {
+                    "title": "Standard",
+                    "enum": [
+                      "standard"
+                    ]
+                  },
+                  {
+                    "title": "Strong",
+                    "enum": [
+                      "strong"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "vacuumDeep": {
+            "type": "object",
+            "title": "Vacuum: Deep Clean",
+            "properties": {
+              "passes": {
+                "type": "string",
+                "title": "Passes",
+                "default": "2",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "1 pass",
+                    "enum": [
+                      "1"
+                    ]
+                  },
+                  {
+                    "title": "2 passes",
+                    "enum": [
+                      "2"
+                    ]
+                  },
+                  {
+                    "title": "3 passes",
+                    "enum": [
+                      "3"
+                    ]
+                  }
+                ]
+              },
+              "suction": {
+                "type": "string",
+                "title": "Suction",
+                "default": "app",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "Quiet",
+                    "enum": [
+                      "quiet"
+                    ]
+                  },
+                  {
+                    "title": "Standard",
+                    "enum": [
+                      "standard"
+                    ]
+                  },
+                  {
+                    "title": "Strong",
+                    "enum": [
+                      "strong"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "mop": {
+            "type": "object",
+            "title": "Mop (button / Automatic)",
+            "properties": {
+              "passes": {
+                "type": "string",
+                "title": "Passes",
+                "default": "app",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "1 pass",
+                    "enum": [
+                      "1"
+                    ]
+                  },
+                  {
+                    "title": "2 passes",
+                    "enum": [
+                      "2"
+                    ]
+                  },
+                  {
+                    "title": "3 passes",
+                    "enum": [
+                      "3"
+                    ]
+                  }
+                ]
+              },
+              "water": {
+                "type": "string",
+                "title": "Water level",
+                "default": "app",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "Slightly dry",
+                    "enum": [
+                      "dry"
+                    ]
+                  },
+                  {
+                    "title": "Standard",
+                    "enum": [
+                      "standard"
+                    ]
+                  },
+                  {
+                    "title": "Slightly wet",
+                    "enum": [
+                      "wet"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "mopQuick": {
+            "type": "object",
+            "title": "Mop: Quick",
+            "properties": {
+              "passes": {
+                "type": "string",
+                "title": "Passes",
+                "default": "1",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "1 pass",
+                    "enum": [
+                      "1"
+                    ]
+                  },
+                  {
+                    "title": "2 passes",
+                    "enum": [
+                      "2"
+                    ]
+                  },
+                  {
+                    "title": "3 passes",
+                    "enum": [
+                      "3"
+                    ]
+                  }
+                ]
+              },
+              "water": {
+                "type": "string",
+                "title": "Water level",
+                "default": "app",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "Slightly dry",
+                    "enum": [
+                      "dry"
+                    ]
+                  },
+                  {
+                    "title": "Standard",
+                    "enum": [
+                      "standard"
+                    ]
+                  },
+                  {
+                    "title": "Slightly wet",
+                    "enum": [
+                      "wet"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "mopDeep": {
+            "type": "object",
+            "title": "Mop: Deep Clean",
+            "properties": {
+              "passes": {
+                "type": "string",
+                "title": "Passes",
+                "default": "2",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "1 pass",
+                    "enum": [
+                      "1"
+                    ]
+                  },
+                  {
+                    "title": "2 passes",
+                    "enum": [
+                      "2"
+                    ]
+                  },
+                  {
+                    "title": "3 passes",
+                    "enum": [
+                      "3"
+                    ]
+                  }
+                ]
+              },
+              "water": {
+                "type": "string",
+                "title": "Water level",
+                "default": "app",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "Slightly dry",
+                    "enum": [
+                      "dry"
+                    ]
+                  },
+                  {
+                    "title": "Standard",
+                    "enum": [
+                      "standard"
+                    ]
+                  },
+                  {
+                    "title": "Slightly wet",
+                    "enum": [
+                      "wet"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "both": {
+            "type": "object",
+            "title": "Vacuum + Mop (button)",
+            "properties": {
+              "task": {
+                "type": "string",
+                "title": "Task",
+                "oneOf": [
+                  {
+                    "title": "Vacuum and Mop (one pass, both at once)",
+                    "enum": [
+                      "vacuum_and_mop"
+                    ]
+                  },
+                  {
+                    "title": "Vacuum then Mop (a vacuum pass, then a mop pass)",
+                    "enum": [
+                      "vacuum_then_mop"
+                    ]
+                  },
+                  {
+                    "title": "Freo Mind (the robot decides)",
+                    "enum": [
+                      "freo_mind"
+                    ]
+                  }
+                ],
+                "default": "vacuum_and_mop"
+              },
+              "passes": {
+                "type": "string",
+                "title": "Passes",
+                "default": "app",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "1 pass",
+                    "enum": [
+                      "1"
+                    ]
+                  },
+                  {
+                    "title": "2 passes",
+                    "enum": [
+                      "2"
+                    ]
+                  },
+                  {
+                    "title": "3 passes",
+                    "enum": [
+                      "3"
+                    ]
+                  }
+                ]
+              },
+              "suction": {
+                "type": "string",
+                "title": "Suction",
+                "default": "app",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "Quiet",
+                    "enum": [
+                      "quiet"
+                    ]
+                  },
+                  {
+                    "title": "Standard",
+                    "enum": [
+                      "standard"
+                    ]
+                  },
+                  {
+                    "title": "Strong",
+                    "enum": [
+                      "strong"
+                    ]
+                  }
+                ]
+              },
+              "water": {
+                "type": "string",
+                "title": "Water level",
+                "default": "app",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "Slightly dry",
+                    "enum": [
+                      "dry"
+                    ]
+                  },
+                  {
+                    "title": "Standard",
+                    "enum": [
+                      "standard"
+                    ]
+                  },
+                  {
+                    "title": "Slightly wet",
+                    "enum": [
+                      "wet"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "bothQuick": {
+            "type": "object",
+            "title": "Vacuum + Mop: Quick",
+            "properties": {
+              "task": {
+                "type": "string",
+                "title": "Task",
+                "oneOf": [
+                  {
+                    "title": "Vacuum and Mop (one pass, both at once)",
+                    "enum": [
+                      "vacuum_and_mop"
+                    ]
+                  },
+                  {
+                    "title": "Vacuum then Mop (a vacuum pass, then a mop pass)",
+                    "enum": [
+                      "vacuum_then_mop"
+                    ]
+                  },
+                  {
+                    "title": "Freo Mind (the robot decides)",
+                    "enum": [
+                      "freo_mind"
+                    ]
+                  }
+                ],
+                "default": "vacuum_and_mop"
+              },
+              "passes": {
+                "type": "string",
+                "title": "Passes",
+                "default": "1",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "1 pass",
+                    "enum": [
+                      "1"
+                    ]
+                  },
+                  {
+                    "title": "2 passes",
+                    "enum": [
+                      "2"
+                    ]
+                  },
+                  {
+                    "title": "3 passes",
+                    "enum": [
+                      "3"
+                    ]
+                  }
+                ]
+              },
+              "suction": {
+                "type": "string",
+                "title": "Suction",
+                "default": "app",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "Quiet",
+                    "enum": [
+                      "quiet"
+                    ]
+                  },
+                  {
+                    "title": "Standard",
+                    "enum": [
+                      "standard"
+                    ]
+                  },
+                  {
+                    "title": "Strong",
+                    "enum": [
+                      "strong"
+                    ]
+                  }
+                ]
+              },
+              "water": {
+                "type": "string",
+                "title": "Water level",
+                "default": "app",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "Slightly dry",
+                    "enum": [
+                      "dry"
+                    ]
+                  },
+                  {
+                    "title": "Standard",
+                    "enum": [
+                      "standard"
+                    ]
+                  },
+                  {
+                    "title": "Slightly wet",
+                    "enum": [
+                      "wet"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "bothDeep": {
+            "type": "object",
+            "title": "Vacuum + Mop: Deep Clean",
+            "properties": {
+              "task": {
+                "type": "string",
+                "title": "Task",
+                "oneOf": [
+                  {
+                    "title": "Vacuum and Mop (one pass, both at once)",
+                    "enum": [
+                      "vacuum_and_mop"
+                    ]
+                  },
+                  {
+                    "title": "Vacuum then Mop (a vacuum pass, then a mop pass)",
+                    "enum": [
+                      "vacuum_then_mop"
+                    ]
+                  },
+                  {
+                    "title": "Freo Mind (the robot decides)",
+                    "enum": [
+                      "freo_mind"
+                    ]
+                  }
+                ],
+                "default": "vacuum_then_mop"
+              },
+              "passes": {
+                "type": "string",
+                "title": "Passes",
+                "default": "2",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "1 pass",
+                    "enum": [
+                      "1"
+                    ]
+                  },
+                  {
+                    "title": "2 passes",
+                    "enum": [
+                      "2"
+                    ]
+                  },
+                  {
+                    "title": "3 passes",
+                    "enum": [
+                      "3"
+                    ]
+                  }
+                ]
+              },
+              "suction": {
+                "type": "string",
+                "title": "Suction",
+                "default": "app",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "Quiet",
+                    "enum": [
+                      "quiet"
+                    ]
+                  },
+                  {
+                    "title": "Standard",
+                    "enum": [
+                      "standard"
+                    ]
+                  },
+                  {
+                    "title": "Strong",
+                    "enum": [
+                      "strong"
+                    ]
+                  }
+                ]
+              },
+              "water": {
+                "type": "string",
+                "title": "Water level",
+                "default": "app",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "Slightly dry",
+                    "enum": [
+                      "dry"
+                    ]
+                  },
+                  {
+                    "title": "Standard",
+                    "enum": [
+                      "standard"
+                    ]
+                  },
+                  {
+                    "title": "Slightly wet",
+                    "enum": [
+                      "wet"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "bothAuto": {
+            "type": "object",
+            "title": "Vacuum + Mop: Automatic",
+            "properties": {
+              "task": {
+                "type": "string",
+                "title": "Task",
+                "oneOf": [
+                  {
+                    "title": "Vacuum and Mop (one pass, both at once)",
+                    "enum": [
+                      "vacuum_and_mop"
+                    ]
+                  },
+                  {
+                    "title": "Vacuum then Mop (a vacuum pass, then a mop pass)",
+                    "enum": [
+                      "vacuum_then_mop"
+                    ]
+                  },
+                  {
+                    "title": "Freo Mind (the robot decides)",
+                    "enum": [
+                      "freo_mind"
+                    ]
+                  }
+                ],
+                "default": "freo_mind"
+              },
+              "passes": {
+                "type": "string",
+                "title": "Passes",
+                "default": "app",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "1 pass",
+                    "enum": [
+                      "1"
+                    ]
+                  },
+                  {
+                    "title": "2 passes",
+                    "enum": [
+                      "2"
+                    ]
+                  },
+                  {
+                    "title": "3 passes",
+                    "enum": [
+                      "3"
+                    ]
+                  }
+                ]
+              },
+              "suction": {
+                "type": "string",
+                "title": "Suction",
+                "default": "app",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "Quiet",
+                    "enum": [
+                      "quiet"
+                    ]
+                  },
+                  {
+                    "title": "Standard",
+                    "enum": [
+                      "standard"
+                    ]
+                  },
+                  {
+                    "title": "Strong",
+                    "enum": [
+                      "strong"
+                    ]
+                  }
+                ]
+              },
+              "water": {
+                "type": "string",
+                "title": "Water level",
+                "default": "app",
+                "oneOf": [
+                  {
+                    "title": "Narwal app settings",
+                    "enum": [
+                      "app"
+                    ]
+                  },
+                  {
+                    "title": "Slightly dry",
+                    "enum": [
+                      "dry"
+                    ]
+                  },
+                  {
+                    "title": "Standard",
+                    "enum": [
+                      "standard"
+                    ]
+                  },
+                  {
+                    "title": "Slightly wet",
+                    "enum": [
+                      "wet"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
       "defaultCleanMode": {
-        "title": "Default clean mode",
+        "title": "Clean mode before one is picked in the Home app",
         "type": "string",
-        "default": "vacuum_then_mop",
+        "default": "both",
         "oneOf": [
           {
-            "title": "Vacuum then Mop (Narwal app settings)",
-            "enum": [
-              "vacuum_then_mop"
-            ]
-          },
-          {
-            "title": "Vacuum then Mop, 1 pass",
-            "enum": [
-              "vacuum_then_mop_quick"
-            ]
-          },
-          {
-            "title": "Vacuum then Mop, 2 passes",
-            "enum": [
-              "vacuum_then_mop_deep"
-            ]
-          },
-          {
-            "title": "Vacuum (Narwal app settings)",
+            "title": "Vacuum (button / Automatic)",
             "enum": [
               "vacuum"
             ]
           },
           {
-            "title": "Vacuum, 1 pass",
+            "title": "Vacuum: Quick",
             "enum": [
-              "vacuum_quick"
+              "vacuumQuick"
             ]
           },
           {
-            "title": "Vacuum, 2 passes",
+            "title": "Vacuum: Deep Clean",
             "enum": [
-              "vacuum_deep"
+              "vacuumDeep"
             ]
           },
           {
-            "title": "Mop (Narwal app settings)",
+            "title": "Mop (button / Automatic)",
             "enum": [
               "mop"
             ]
           },
           {
-            "title": "Mop, 1 pass",
+            "title": "Mop: Quick",
             "enum": [
-              "mop_quick"
+              "mopQuick"
             ]
           },
           {
-            "title": "Mop, 2 passes",
+            "title": "Mop: Deep Clean",
             "enum": [
-              "mop_deep"
+              "mopDeep"
             ]
           },
           {
-            "title": "Freo Mind",
+            "title": "Vacuum + Mop (button)",
             "enum": [
-              "freo_mind"
+              "both"
+            ]
+          },
+          {
+            "title": "Vacuum + Mop: Quick",
+            "enum": [
+              "bothQuick"
+            ]
+          },
+          {
+            "title": "Vacuum + Mop: Deep Clean",
+            "enum": [
+              "bothDeep"
+            ]
+          },
+          {
+            "title": "Vacuum + Mop: Automatic",
+            "enum": [
+              "bothAuto"
             ]
           }
-        ],
-        "description": "Used until a mode is picked in the Home app."
+        ]
       },
       "serialNumber": {
         "title": "Robot serial number",
@@ -150,5 +1059,244 @@
         ]
       }
     }
-  }
+  },
+  "layout": [
+    "name",
+    "email",
+    {
+      "key": "password",
+      "type": "password"
+    },
+    "serialNumber",
+    {
+      "type": "fieldset",
+      "title": "Clean modes: Vacuum",
+      "description": "The Home app's Vacuum button and its ⋯ menu (Automatic, Quick, Deep Clean). \"Narwal app settings\" uses the per-room settings saved in the Narwal app.",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "type": "fieldset",
+          "title": "Vacuum (button / Automatic)",
+          "items": [
+            {
+              "key": "cleanModes.vacuum.passes"
+            },
+            {
+              "key": "cleanModes.vacuum.suction"
+            }
+          ]
+        },
+        {
+          "type": "fieldset",
+          "title": "Vacuum: Quick",
+          "items": [
+            {
+              "key": "cleanModes.vacuumQuick.passes"
+            },
+            {
+              "key": "cleanModes.vacuumQuick.suction"
+            }
+          ]
+        },
+        {
+          "type": "fieldset",
+          "title": "Vacuum: Deep Clean",
+          "items": [
+            {
+              "key": "cleanModes.vacuumDeep.passes"
+            },
+            {
+              "key": "cleanModes.vacuumDeep.suction"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Clean modes: Mop",
+      "description": "The Home app's Mop button and its ⋯ menu.",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "type": "fieldset",
+          "title": "Mop (button / Automatic)",
+          "items": [
+            {
+              "key": "cleanModes.mop.passes"
+            },
+            {
+              "key": "cleanModes.mop.water"
+            }
+          ]
+        },
+        {
+          "type": "fieldset",
+          "title": "Mop: Quick",
+          "items": [
+            {
+              "key": "cleanModes.mopQuick.passes"
+            },
+            {
+              "key": "cleanModes.mopQuick.water"
+            }
+          ]
+        },
+        {
+          "type": "fieldset",
+          "title": "Mop: Deep Clean",
+          "items": [
+            {
+              "key": "cleanModes.mopDeep.passes"
+            },
+            {
+              "key": "cleanModes.mopDeep.water"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Clean modes: Vacuum + Mop",
+      "description": "The Home app's combined button and its ⋯ menu. The Home app names this button after the task chosen for it.",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "type": "fieldset",
+          "title": "Vacuum + Mop (button)",
+          "items": [
+            {
+              "key": "cleanModes.both.task"
+            },
+            {
+              "key": "cleanModes.both.passes",
+              "condition": {
+                "functionBody": "return (model.cleanModes?.both?.task ?? 'vacuum_and_mop') !== 'freo_mind';"
+              }
+            },
+            {
+              "key": "cleanModes.both.suction",
+              "condition": {
+                "functionBody": "return (model.cleanModes?.both?.task ?? 'vacuum_and_mop') !== 'freo_mind';"
+              }
+            },
+            {
+              "key": "cleanModes.both.water",
+              "condition": {
+                "functionBody": "return (model.cleanModes?.both?.task ?? 'vacuum_and_mop') !== 'freo_mind';"
+              }
+            }
+          ]
+        },
+        {
+          "type": "fieldset",
+          "title": "Vacuum + Mop: Quick",
+          "items": [
+            {
+              "key": "cleanModes.bothQuick.task"
+            },
+            {
+              "key": "cleanModes.bothQuick.passes",
+              "condition": {
+                "functionBody": "return (model.cleanModes?.bothQuick?.task ?? 'vacuum_and_mop') !== 'freo_mind';"
+              }
+            },
+            {
+              "key": "cleanModes.bothQuick.suction",
+              "condition": {
+                "functionBody": "return (model.cleanModes?.bothQuick?.task ?? 'vacuum_and_mop') !== 'freo_mind';"
+              }
+            },
+            {
+              "key": "cleanModes.bothQuick.water",
+              "condition": {
+                "functionBody": "return (model.cleanModes?.bothQuick?.task ?? 'vacuum_and_mop') !== 'freo_mind';"
+              }
+            }
+          ]
+        },
+        {
+          "type": "fieldset",
+          "title": "Vacuum + Mop: Deep Clean",
+          "items": [
+            {
+              "key": "cleanModes.bothDeep.task"
+            },
+            {
+              "key": "cleanModes.bothDeep.passes",
+              "condition": {
+                "functionBody": "return (model.cleanModes?.bothDeep?.task ?? 'vacuum_then_mop') !== 'freo_mind';"
+              }
+            },
+            {
+              "key": "cleanModes.bothDeep.suction",
+              "condition": {
+                "functionBody": "return (model.cleanModes?.bothDeep?.task ?? 'vacuum_then_mop') !== 'freo_mind';"
+              }
+            },
+            {
+              "key": "cleanModes.bothDeep.water",
+              "condition": {
+                "functionBody": "return (model.cleanModes?.bothDeep?.task ?? 'vacuum_then_mop') !== 'freo_mind';"
+              }
+            }
+          ]
+        },
+        {
+          "type": "fieldset",
+          "title": "Vacuum + Mop: Automatic",
+          "items": [
+            {
+              "key": "cleanModes.bothAuto.task"
+            },
+            {
+              "key": "cleanModes.bothAuto.passes",
+              "condition": {
+                "functionBody": "return (model.cleanModes?.bothAuto?.task ?? 'freo_mind') !== 'freo_mind';"
+              }
+            },
+            {
+              "key": "cleanModes.bothAuto.suction",
+              "condition": {
+                "functionBody": "return (model.cleanModes?.bothAuto?.task ?? 'freo_mind') !== 'freo_mind';"
+              }
+            },
+            {
+              "key": "cleanModes.bothAuto.water",
+              "condition": {
+                "functionBody": "return (model.cleanModes?.bothAuto?.task ?? 'freo_mind') !== 'freo_mind';"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "defaultCleanMode",
+    {
+      "type": "fieldset",
+      "title": "Extra accessories",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        "cleaningSensor",
+        "consumables",
+        "replaceAtPercent",
+        "dockedMinutes"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "ecobee Smart Security",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        "securityHold"
+      ]
+    },
+    "region"
+  ]
 }

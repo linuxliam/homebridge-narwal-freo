@@ -30,7 +30,7 @@ Message formats come from the MIT-licensed Home Assistant integrations
   "name": "Freo",
   "email": "you@example.com",
   "password": "…",
-  "defaultCleanMode": "vacuum_then_mop",
+  "defaultCleanMode": "both",
   "cleaningSensor": true,
   "consumables": true,
   "_bridge": {
@@ -47,23 +47,38 @@ HomeKit bridges.
 
 ## Clean modes in the Home app
 
-Apple Home groups modes by their Vacuum / Mop tags, names each group after its first mode's
-label, and shows the modes inside a group as Automatic / Quick / Deep Clean in its "…" menu:
+The Home app shows three buttons, **Vacuum**, **Mop** and a combined **Vacuum + Mop** one (it
+names that button after the task chosen for it), each with a "⋯" menu of Automatic / Quick / Deep
+Clean. What each of these does is set in the plugin settings (`cleanModes`):
 
-| Home app | Vacuum | Mop | Vacuum then Mop |
-|---|---|---|---|
-| (button) | Narwal app settings | Narwal app settings | Narwal app settings |
-| Quick | 1 pass | 1 pass | 1 pass each |
-| Deep Clean | 2 passes | 2 passes | 2 passes each |
-| Automatic | (= button) | (= button) | Freo Mind |
+| Home app | Default |
+|---|---|
+| Vacuum (button = Automatic) | Vacuum, Narwal app settings |
+| Vacuum: Quick / Deep Clean | 1 pass / 2 passes |
+| Mop (button = Automatic) | Mop, Narwal app settings |
+| Mop: Quick / Deep Clean | 1 pass / 2 passes |
+| Vacuum + Mop (button) | Vacuum and Mop (vacuums and mops in one pass), Narwal app settings |
+| Vacuum + Mop: Quick | Vacuum and Mop, 1 pass |
+| Vacuum + Mop: Deep Clean | Vacuum then Mop (a vacuum pass, then a mop pass), 2 passes each |
+| Vacuum + Mop: Automatic | Freo Mind |
 
-Quick and Deep Clean only change the pass count; suction and water level still follow the Narwal
-app. Narwal's mode 4 ("vacuum and mop") isn't offered: the original Freo's app doesn't have it, and
-the robot mops first in that mode.
+For each one you can set the passes (1–3), suction (quiet / standard / strong) and water level
+(slightly dry / standard / slightly wet), or leave them at **Narwal app settings**: the per-room
+settings saved in the Narwal app for that task. The combined slots also choose the task: Vacuum and
+Mop, Vacuum then Mop, or Freo Mind (which always uses the robot's own settings). If the Narwal app
+hasn't sent its settings for a task yet, standard suction and water are used and the log says so.
+
+```json
+"cleanModes": {
+  "both": { "task": "vacuum_then_mop" },
+  "vacuumDeep": { "passes": "2", "suction": "strong" },
+  "mop": { "water": "wet" }
+}
+```
 
 Matter saves the vacuum's current clean mode, and matter.js refuses to start the vacuum if that
-mode number is no longer offered, so mode numbers are never removed, only reused (see
-`RETIRED_MODES` in `lib/vacuum.js`).
+mode number is no longer offered, so the ten slots and their numbers never change, only what they
+do (see `RETIRED_MODES` in `lib/vacuum.js`).
 
 ## Cleaning sensor and consumables (optional)
 

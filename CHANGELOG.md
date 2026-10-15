@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0
+
+- `cleanModes`: choose what each Home app clean mode does: passes, suction and water level for
+  every Vacuum / Mop / Vacuum + Mop slot, and the task (Vacuum and Mop, Vacuum then Mop, Freo Mind)
+  for the combined ones. The settings page groups them per Home app button.
+- Narwal's one-pass **Vacuum and Mop** is now offered and is the default for the combined button
+  and its Quick mode; Deep Clean stays Vacuum then Mop with 2 passes each, Automatic stays Freo Mind.
+- `defaultCleanMode` now names a slot (`both`, `vacuumQuick`, …); the old values still work.
+
 ## 0.2.0
 
 - Renamed to `homebridge-narwal-freo`: only the original Narwal Freo (YJCC012) is supported.
