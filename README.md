@@ -145,8 +145,9 @@ setup code); the vacuum keeps its own Matter pairing.
   changes the security system in between (disarm on arriving home, etc.), it's left alone. If the
   security system can't be reached or the alarm is triggered, the start is **refused** (the Home app
   shows an error) rather than risking a false alarm. By default it talks to
-  [homebridge-ecobee-security](https://github.com/seanfletchr/homebridge-ecobee-security) 0.2.0+ on
-  the same Homebridge; `securityEndpoint` points it at anything else offering the API below.
+  [homebridge-ecobee-security](https://github.com/seanfletchr/homebridge-ecobee-security) on the
+  same Homebridge (0.5.0+ with **Allow security holds** turned on; 0.2.0–0.4.x always allowed it, but
+  can't track two robots); `securityEndpoint` points it at anything else offering the API below.
 
 ## Security hold API
 
