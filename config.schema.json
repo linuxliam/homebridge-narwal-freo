@@ -1,0 +1,154 @@
+{
+  "pluginAlias": "NarwalPlatform",
+  "pluginType": "platform",
+  "singular": true,
+  "headerDisplay": "Shows the original Narwal Freo (model YJCC012) as a native robot vacuum in Apple Home (Matter). Needs Matter enabled for this plugin's child bridge. Unofficial: uses the same Narwal cloud as the app. Newer Narwal models are not supported.",
+  "schema": {
+    "type": "object",
+    "required": [
+      "email",
+      "password"
+    ],
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "default": "Freo",
+        "description": "Name shown in the Home app."
+      },
+      "email": {
+        "title": "Narwal account email",
+        "type": "string",
+        "format": "email"
+      },
+      "password": {
+        "title": "Narwal account password",
+        "type": "string",
+        "x-schema-form": {
+          "type": "password"
+        }
+      },
+      "defaultCleanMode": {
+        "title": "Default clean mode",
+        "type": "string",
+        "default": "vacuum_then_mop",
+        "oneOf": [
+          {
+            "title": "Vacuum then Mop (Narwal app settings)",
+            "enum": [
+              "vacuum_then_mop"
+            ]
+          },
+          {
+            "title": "Vacuum then Mop, 1 pass",
+            "enum": [
+              "vacuum_then_mop_quick"
+            ]
+          },
+          {
+            "title": "Vacuum then Mop, 2 passes",
+            "enum": [
+              "vacuum_then_mop_deep"
+            ]
+          },
+          {
+            "title": "Vacuum (Narwal app settings)",
+            "enum": [
+              "vacuum"
+            ]
+          },
+          {
+            "title": "Vacuum, 1 pass",
+            "enum": [
+              "vacuum_quick"
+            ]
+          },
+          {
+            "title": "Vacuum, 2 passes",
+            "enum": [
+              "vacuum_deep"
+            ]
+          },
+          {
+            "title": "Mop (Narwal app settings)",
+            "enum": [
+              "mop"
+            ]
+          },
+          {
+            "title": "Mop, 1 pass",
+            "enum": [
+              "mop_quick"
+            ]
+          },
+          {
+            "title": "Mop, 2 passes",
+            "enum": [
+              "mop_deep"
+            ]
+          },
+          {
+            "title": "Freo Mind",
+            "enum": [
+              "freo_mind"
+            ]
+          }
+        ],
+        "description": "Used until a mode is picked in the Home app."
+      },
+      "serialNumber": {
+        "title": "Robot serial number",
+        "type": "string",
+        "description": "Only needed if the account has more than one robot."
+      },
+      "cleaningSensor": {
+        "title": "Cleaning sensor",
+        "type": "boolean",
+        "default": false,
+        "description": "Adds an occupancy sensor that shows Detected while the robot is away from the dock, so Home app automations can react to cleaning (the Home app can't trigger on the vacuum itself). Needs this child bridge paired in the Home app as well."
+      },
+      "consumables": {
+        "title": "Consumables",
+        "type": "boolean",
+        "default": false,
+        "description": "Shows the remaining life of the filter, side brush, rolling brushes, mops and filter sponge, as listed in the Narwal app's maintenance page. Updated hourly and after each clean."
+      },
+      "replaceAtPercent": {
+        "title": "Show \"replace\" at (% life left)",
+        "type": "integer",
+        "default": 10,
+        "minimum": 0,
+        "maximum": 100,
+        "condition": {
+          "functionBody": "return model.consumables === true;"
+        }
+      },
+      "dockedMinutes": {
+        "title": "Cleaning finished after (minutes on the dock)",
+        "type": "integer",
+        "default": 10,
+        "minimum": 1,
+        "description": "The Freo returns to the base mid-clean to wash its mops; this must be longer than those visits. Used by the cleaning sensor and the security hold."
+      },
+      "securityHold": {
+        "title": "Switch ecobee security from Away to Stay while cleaning",
+        "type": "boolean",
+        "default": false,
+        "description": "Needs homebridge-ecobee-security 0.2.0+ on this Homebridge. Before the robot sets off, an Away system is switched to Stay (so the motion sensors don't trigger it); once cleaning has finished (minutes on the dock, above) it goes back to Away. If the security system can't be reached, the clean is refused."
+      },
+      "region": {
+        "title": "Narwal cloud region",
+        "type": "string",
+        "default": "us",
+        "oneOf": [
+          {
+            "title": "United States / Canada",
+            "enum": [
+              "us"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

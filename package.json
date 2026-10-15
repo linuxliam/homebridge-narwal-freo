@@ -1,0 +1,42 @@
+{
+  "name": "homebridge-narwal-freo",
+  "displayName": "Narwal Freo",
+  "version": "0.2.0",
+  "description": "The original Narwal Freo as a native Matter robot vacuum in Apple Home, with optional cleaning and consumable sensors (unofficial, Narwal cloud)",
+  "type": "module",
+  "main": "index.js",
+  "license": "MIT",
+  "author": "Sean Fletcher",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seanfletchr/homebridge-narwal-freo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/seanfletchr/homebridge-narwal-freo/issues"
+  },
+  "homepage": "https://github.com/seanfletchr/homebridge-narwal-freo#readme",
+  "keywords": [
+    "homebridge-plugin",
+    "supports-hap",
+    "homebridge",
+    "matter",
+    "narwal",
+    "freo",
+    "robot vacuum"
+  ],
+  "engines": {
+    "node": "^22.0.0 || ^24.0.0",
+    "homebridge": "^2.4.0"
+  },
+  "dependencies": {
+    "mqtt": "5.16.0"
+  },
+  "files": [
+    "index.js",
+    "lib",
+    "config.schema.json",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ]
+}
