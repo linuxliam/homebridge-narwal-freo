@@ -17,8 +17,10 @@
 - `cleanModes`: choose what each Home app clean mode does: passes, suction and water level for
   every Vacuum / Mop / Vacuum + Mop slot, and the task (Vacuum and Mop, Vacuum then Mop, Freo Mind)
   for the combined ones. The settings page groups them per Home app button.
-- Narwal's one-pass **Vacuum and Mop** is now offered and is the default for the combined button
-  and its Quick mode; Deep Clean stays Vacuum then Mop with 2 passes each, Automatic stays Freo Mind.
+- Every Home app choice (Vacuum, Mop, combined) now has the same Automatic / Quick / Deep Clean,
+  with tapping the choice picking Automatic. The combined choice no longer has a separate button mode:
+  its Automatic is Narwal's one-pass **Vacuum and Mop** by default (Quick: 1 pass), Deep Clean is
+  Vacuum then Mop with 2 passes each, and **Freo Mind** is a task you can pick for any of the three.
 - `defaultCleanMode` is no longer in the settings (it only chose the mode for a robot's very first start,
   before a mode is picked in the Home app); configs that set it still work, with slot names (`both`,
   `vacuumQuick`, …) or the old values.

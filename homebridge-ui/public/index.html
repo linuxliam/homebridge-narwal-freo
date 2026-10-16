@@ -76,9 +76,9 @@
   const LEGACY_KEYS = ['defaultCleanMode', 'cleanModes', 'cleaningSensor', 'consumables', 'replaceAtPercent'];
 
   const GROUPS = [
-    ['Vacuum', [['vacuum', 'Button / Automatic'], ['vacuumQuick', 'Quick'], ['vacuumDeep', 'Deep Clean']]],
-    ['Mop', [['mop', 'Button / Automatic'], ['mopQuick', 'Quick'], ['mopDeep', 'Deep Clean']]],
-    ['Vacuum + Mop', [['both', 'Button'], ['bothQuick', 'Quick'], ['bothDeep', 'Deep Clean'], ['bothAuto', 'Automatic']]],
+    ['Vacuum', [['vacuum', 'Automatic'], ['vacuumQuick', 'Quick'], ['vacuumDeep', 'Deep Clean']]],
+    ['Mop', [['mop', 'Automatic'], ['mopQuick', 'Quick'], ['mopDeep', 'Deep Clean']]],
+    ['Vacuum + Mop', [['both', 'Automatic'], ['bothQuick', 'Quick'], ['bothDeep', 'Deep Clean']]],
   ];
   const CHOICES = {
     task: [['vacuum_and_mop', 'Vacuum and Mop'], ['vacuum_then_mop', 'Vacuum then Mop'], ['freo_mind', 'Freo Mind']],
@@ -357,9 +357,9 @@
 
     const modes = el('div', { className: 'mb-3' },
       el('b', { textContent: 'Clean modes' }),
-      el('p', { className: 'hint mb-1', textContent: 'The Home app has three buttons, Vacuum, Mop and a combined one '
-        + '(named after its task), each with Automatic, Quick and Deep Clean in its ⋯ menu. Choose what each does. '
-        + '"App" uses the settings saved for each room in the Narwal app.' }));
+      el('p', { className: 'hint mb-1', textContent: 'The Home app offers Vacuum, Mop and a combined choice (named after '
+        + 'its Automatic task), each with Automatic, Quick and Deep Clean in its ⋯ menu; tapping the choice itself '
+        + 'picks Automatic. Choose what each does. "App" uses the settings saved for each room in the Narwal app.' }));
     for (const g of GROUPS) {
       modes.append(modeGroup(serial, entry, g));
     }
