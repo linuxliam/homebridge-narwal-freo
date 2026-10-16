@@ -1,3 +1,5 @@
+<p align="center"><img src="icon.png" alt="" width="100" height="100"></p>
+
 # homebridge-narwal-freo
 
 Shows the original **Narwal Freo** (model YJCC012 / product group J3) in Apple Home as a

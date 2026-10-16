@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1
+
+- Plugin icon in the README.
+
 ## 0.3.0
 
 - **Several robots:** a `robots` list, each robot with its own name, clean modes, cleaning sensor and
