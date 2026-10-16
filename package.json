@@ -36,6 +36,7 @@
     "index.js",
     "lib",
     "homebridge-ui",
+    "docs",
     "config.schema.json",
     "README.md",
     "CHANGELOG.md",
