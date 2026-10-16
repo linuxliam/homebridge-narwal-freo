@@ -996,7 +996,7 @@
         "title": "Keep security from arming Away while cleaning",
         "type": "boolean",
         "default": false,
-        "description": "Keeps the security system from arming Away while a robot cleans: if it's armed Away when a robot starts, it's switched to Stay, and Away comes back when the robot is done. Needs a security plugin that supports holds. See https://github.com/seanfletchr/homebridge-narwal-freo/blob/main/docs/security-hold.md"
+        "description": "Keeps the security system from arming Away while a robot cleans: if it's armed Away when a robot starts, it's switched to Home, and Away comes back when the robot is done. Needs a security plugin that supports holds. See https://github.com/seanfletchr/homebridge-narwal-freo/blob/main/docs/security-hold.md"
       },
       "securityStoppedMinutes": {
         "title": "Back to Away when a robot stops moving for (minutes)",
@@ -1004,7 +1004,7 @@
         "default": 10,
         "minimum": 0,
         "maximum": 240,
-        "description": "A robot that stands still away from its base mid-job (stuck, lifted, paused…) can't set off motion sensors: after this many minutes it releases its hold, so the security system goes back to Away, and it holds Stay again as soon as it moves. Time at the base (mop washes, recharging) doesn't count. 0: keep Stay until the job ends."
+        "description": "A robot that stands still away from its base mid-job (stuck, lifted, paused…) can't set off motion sensors: after this many minutes it releases its hold, so the security system goes back to Away, and it switches to Home again as soon as it moves. Time at the base (mop washes, recharging) doesn't count. 0: keep Home until the job ends."
       },
       "securityPlugin": {
         "title": "Security system plugin",

@@ -120,33 +120,45 @@ setup code); the vacuum keeps its own Matter pairing.
 
 ## Vacation mode (optional)
 
-Leaving for a trip right after tracking dirt in? With **`vacationMode`** on, the plugin follows a
-switch named **Vacation Mode** (`vacationSwitch` changes the name) on any bridge of the same
-Homebridge, for example a [homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) switch.
-When the switch is turned on, the next clean still runs as usual, so you come home to a clean house;
-after that, cleans started from the Home app (your scheduled automations included) are cut back until
-the switch is turned off, so an empty house isn't mopped every day. Your schedules stay as they are.
+Going away? Turn on **Vacation mode** in the settings, and a **Vacation Mode** switch in the Home app
+cuts back cleaning while you're gone. The next clean still runs, so you come home to a clean house.
+After that, cleans started from the Home app, including your scheduled automations, are skipped (or
+run vacuum only) until you turn the switch off. Your schedules stay as they are.
 
+The plugin uses your existing "Vacation Mode" switch if you have one on this Homebridge (a
+[homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) switch, for example), and adds one
+if you don't. The added switch is on the plugin's bridge, so add that bridge to the Home app if you
+haven't (the vacuum keeps its own Matter pairing).
+
+- **`vacationSwitch`**: the switch's name (default "Vacation Mode").
 - **`vacationCleans`** (default 1, up to 5): how many cleans still run as usual. 0: none.
-- **`vacationAfter`**: what happens to later cleans. `none` (default) refuses them; `vacuum` runs
-  them as vacuum-only cleans: Mop and Vacuum and Mop cleans vacuum instead, at the same Automatic,
-  Quick or Deep Clean, saving water and cleaning fluid while dust is still picked up.
+- **`vacationAfter`**: what happens to later cleans: `none` (default) skips them, `vacuum` runs them
+  vacuum only, at the same Automatic, Quick or Deep Clean, saving water while still picking up dust.
 
-- A clean that's already running when the switch is turned on doesn't count; the next ones do.
-  Resuming a paused clean is always allowed.
-- Cleans started from the Narwal app or its own schedule aren't blocked (the plugin can't stop the
-  robot from starting them), but they count toward the allowed cleans.
-- The switch is read over HAP on the Homebridge machine every 30 seconds, which needs Homebridge's
-  insecure mode (Homebridge Settings, on by default; the Homebridge UI's accessory control uses it
-  too). Child bridges must have a fixed port (the Homebridge UI sets one). The log says which bridge
-  the switch was found on, or why it wasn't.
-- **No such switch?** If none turns up within 3 minutes of starting, the plugin adds its own
-  Vacation Mode switch to its child bridge's HomeKit side (pair that bridge in the Home app if you
-  haven't; the vacuum keeps its own Matter pairing).
-- The first switch used is kept for good, since your scenes and automations are built on it: once
-  the plugin has its own, it stops looking; once it follows one on another bridge, it never adds its
-  own and only looks on that bridge (while that bridge is down it keeps the last state). To start
-  over with another switch, turn vacation mode off and on again in the plugin settings.
+Good to know:
+
+- **Schedule cleans with Home app automations**, not in the Narwal app: vacation mode then decides
+  before the robot gets the command. Cleans started from the Narwal app, or by schedules set there,
+  can't be stopped in time (a mop clean wets its mops before the plugin finds out), but they count
+  toward the allowed cleans.
+- A clean already running when you turn the switch on doesn't count. Resuming a paused clean is
+  always allowed.
+- Finding an existing switch needs Homebridge's insecure mode (Homebridge Settings, on by default).
+- Once the plugin has found or added a switch, it keeps using it, since your automations are built
+  on it. To start over, turn vacation mode off and on again in the plugin settings.
+
+## Security system (optional)
+
+Motion sensors can mistake a robot vacuum for an intruder: ecobee's do, and set off the alarm. With
+**Keep security from arming Away while cleaning** (`securityHold`) on, the robot asks the security
+system to switch from Away to **Home** before it starts, so it can clean safely. Doors and windows
+stay armed. When the robot is done, the system goes back to Away. If Away is armed while the robot is
+cleaning, it heads back to its base, or pauses where it is if it can't make it in time.
+
+It needs a security system plugin that supports this, such as
+[homebridge-ecobee-security](https://github.com/seanfletchr/homebridge-ecobee-security). Setup,
+what happens in each situation, and the API for other plugins:
+[docs/security-hold.md](docs/security-hold.md).
 
 ## How it behaves
 
@@ -171,13 +183,3 @@ the switch is turned off, so an empty house isn't mopped every day. Your schedul
   battery, sensor — with Narwal's message as the details. Codes not in the table are routine
   notices (e.g. 0x01010072 during mop runs) and are ignored. The cloud work status (polled every
   3 minutes) is only used when live status isn't arriving.
-- **Security hold** (`securityHold`, "Keep security from arming Away while cleaning", optional):
-  keeps a security system from arming **Away** while a robot cleans, so the motion sensors don't see
-  it. If it's armed Away when the robot starts it's switched to Stay, and Away comes back when the
-  job is done; Away asked for in the meantime waits, and if Away is armed anyway (say in the ecobee
-  app) the robot heads back to its base before the exit delay ends, or pauses where it is if it
-  can't make it. Stay and Night are not held back. Works with any security system plugin that offers the hold (the settings page lists the
-  installed ones) or anything else answering its API. A robot that stands still away from its base
-  for 10 minutes (`securityStoppedMinutes`) lets the system go back to Away, and asks for a new hold
-  as soon as it moves. See [docs/security-hold.md](docs/security-hold.md)
-  for how it behaves, how to set it up, and the API for security plugin authors.
