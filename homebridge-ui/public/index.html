@@ -52,7 +52,8 @@
     <input class="form-check-input" type="checkbox" role="switch" id="security-hold">
     <label class="form-check-label" for="security-hold">Switch from Away to Stay while cleaning</label>
   </div>
-  <p class="hint mb-2">Keeps a cleaning robot from setting off the motion sensors while you're away.
+  <p class="hint mb-2">Keeps a cleaning robot from setting off the motion sensors while you're away. Works with
+    security system plugins that support security holds; some need holds allowed in their own settings.
     <a href="https://github.com/seanfletchr/homebridge-narwal-freo/blob/main/docs/security-hold.md" target="_blank" rel="noopener">Learn more…</a></p>
   <div id="security-provider-box" hidden>
     <label for="security-provider" class="form-label">Security system</label>
@@ -420,8 +421,8 @@
     $('security-hold').checked = Boolean(block.securityHold);
     $('security-endpoint').value = block.securityEndpoint ?? '';
     $('security-provider-hint').textContent = providers.length
-      ? ''
-      : 'No installed plugin offers the security hold.';
+      ? 'Installed plugins that support security holds. Make sure holds are allowed in the plugin\'s settings.'
+      : 'No installed plugin supports security holds.';
     showSecurityFields();
   }
 
