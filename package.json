@@ -32,6 +32,9 @@
     "mqtt": "5.16.0",
     "@homebridge/plugin-ui-utils": "^2.2.6"
   },
+  "homebridge-security-hold": {
+    "client": true
+  },
   "files": [
     "index.js",
     "lib",

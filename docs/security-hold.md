@@ -22,7 +22,7 @@ cleans, and back to Away when it's done.
 
 1. Install a security system plugin that offers the hold, and allow holds in its settings if it asks
    for that. [homebridge-ecobee-security](https://github.com/seanfletchr/homebridge-ecobee-security)
-   is one; its settings call it **Allow security holds**.
+   is one: turn on **Allow security holds** and tick **Narwal Freo** in its list of plugins.
 2. In this plugin's settings, turn on **Switch from Away to Stay while cleaning** and pick the
    security system. The list shows every installed plugin that offers the hold.
 
@@ -52,6 +52,13 @@ the storage folder:
 Plugins that support the hold find it there: this plugin's settings page lists every installed
 plugin with that field, using its `displayName`.
 
+Plugins that *ask* for holds can declare that too, so a security plugin can list them (with their
+`displayName`) before their first request, for example to let you allow each one:
+
+```json
+"homebridge-security-hold": { "client": true }
+```
+
 ### Offering it from anything else
 
 Serve the same two requests at an http(s) URL. Clients append the paths to the URL they're given;
@@ -59,19 +66,23 @@ basic auth in the URL works.
 
 ### Requests
 
-`by` is the name of whoever is asking (for this plugin, the robot's name in the Home app). Track
-holds per `by`: with two robots out, the first one back must not re-arm Away.
+`by` is the name of whoever is asking (for this plugin, the robot's name in the Home app), and
+`plugin` the asking plugin's package name, so holds can be allowed per plugin (`plugin` is optional;
+without it, go by `by`). Track holds per `by`: with two robots out, the first one back must not
+re-arm Away.
 
-- `POST <endpoint>/hold?by=<name>`
+- `POST <endpoint>/hold?by=<name>&plugin=<package>`
   - If the system is armed Away (or arming Away): switch it to Stay and remember the hold.
   - If it's already held: add `by` to the holders.
   - Otherwise: change nothing.
 
   Answer 2xx, optionally with JSON `{ "ok": true, "held": true|false, "state": "…" }`. When it isn't
   safe to start (alarm going off, state unknown), answer `{ "ok": false, "reason": "…" }` or any
-  non-2xx status: the client doesn't start.
+  non-2xx status (e.g. 403 when holds aren't allowed for this plugin): the client doesn't start.
 
-- `POST <endpoint>/release?by=<name>`
+- `POST <endpoint>/release?by=<name>&plugin=<package>`
+  - Accept it from a current holder even if its permission was taken away meanwhile, so the
+    system isn't left in Stay.
   - Remove `by` from the holders.
   - If it was the last one and the system is still in the Stay the hold set: arm Away again.
   - If anyone changed the system during the hold: drop the hold and leave the system alone.
