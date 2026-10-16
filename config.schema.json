@@ -72,7 +72,7 @@
                       "default": "app",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -103,7 +103,7 @@
                       "default": "app",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -140,7 +140,7 @@
                       "default": "1",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -171,7 +171,7 @@
                       "default": "app",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -208,7 +208,7 @@
                       "default": "2",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -239,7 +239,7 @@
                       "default": "app",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -276,7 +276,7 @@
                       "default": "app",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -307,7 +307,7 @@
                       "default": "app",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -344,7 +344,7 @@
                       "default": "1",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -375,7 +375,7 @@
                       "default": "app",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -412,7 +412,7 @@
                       "default": "2",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -443,7 +443,7 @@
                       "default": "app",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -505,7 +505,7 @@
                       "default": "app",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -536,7 +536,7 @@
                       "default": "app",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -567,7 +567,7 @@
                       "default": "app",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -629,7 +629,7 @@
                       "default": "1",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -660,7 +660,7 @@
                       "default": "app",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -691,7 +691,7 @@
                       "default": "app",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -753,7 +753,7 @@
                       "default": "2",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -784,7 +784,7 @@
                       "default": "app",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -815,7 +815,7 @@
                       "default": "app",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -877,7 +877,7 @@
                       "default": "app",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -908,7 +908,7 @@
                       "default": "app",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -939,7 +939,7 @@
                       "default": "app",
                       "oneOf": [
                         {
-                          "title": "Narwal app settings",
+                          "title": "Default",
                           "enum": [
                             "app"
                           ]
@@ -990,13 +990,21 @@
             }
           }
         },
-        "description": "The robots to show in the Home app, each with its own settings. Without this list, the first robot on the account is used with the settings at the top level (as up to 0.2.x)."
+        "description": "The robots to show in the Home app, each with its own settings. Without this list, the first robot on the account is used."
       },
       "securityHold": {
-        "title": "Switch the security system from Away to Stay while cleaning",
+        "title": "Keep security from arming Away while cleaning",
         "type": "boolean",
         "default": false,
-        "description": "Switch the security system from Away to Stay while a robot cleans, and back when it's done. See https://github.com/seanfletchr/homebridge-narwal-freo/blob/main/docs/security-hold.md"
+        "description": "Keeps the security system from arming Away while a robot cleans: if it's armed Away when a robot starts, it's switched to Stay, and Away comes back when the robot is done. Needs a security plugin that supports holds. See https://github.com/seanfletchr/homebridge-narwal-freo/blob/main/docs/security-hold.md"
+      },
+      "securityStoppedMinutes": {
+        "title": "Back to Away when a robot stops moving for (minutes)",
+        "type": "integer",
+        "default": 10,
+        "minimum": 0,
+        "maximum": 240,
+        "description": "A robot that stands still away from its base mid-job (stuck, lifted, paused…) can't set off motion sensors: after this many minutes it releases its hold, so the security system goes back to Away, and it holds Stay again as soon as it moves. Time at the base (mop washes, recharging) doesn't count. 0: keep Stay until the job ends."
       },
       "securityPlugin": {
         "title": "Security system plugin",
@@ -1007,6 +1015,47 @@
         "title": "Security hold endpoint",
         "type": "string",
         "description": "Instead of a plugin: a Unix socket path or http(s) URL answering the security hold API."
+      },
+      "vacationMode": {
+        "title": "Enable Vacation Mode",
+        "type": "boolean",
+        "default": false,
+        "description": "Cuts back scheduled cleaning while Vacation Mode is on in the Home app. If no existing vacation switch is found, one will be added automatically. See https://github.com/seanfletchr/homebridge-narwal-freo#vacation-mode-optional"
+      },
+      "vacationSwitch": {
+        "title": "Vacation switch name",
+        "type": "string",
+        "default": "Vacation Mode",
+        "placeholder": "Vacation Mode",
+        "description": "The name of the switch to follow, as shown in Homebridge (case and spaces don't matter)."
+      },
+      "vacationCleans": {
+        "title": "Cleans allowed after vacation mode is turned on",
+        "type": "integer",
+        "default": 1,
+        "minimum": 0,
+        "maximum": 5,
+        "description": "How many cleans still run as usual (so you come home to a clean house). 0: none."
+      },
+      "vacationAfter": {
+        "title": "After that",
+        "type": "string",
+        "default": "none",
+        "oneOf": [
+          {
+            "title": "No cleaning",
+            "enum": [
+              "none"
+            ]
+          },
+          {
+            "title": "Vacuum only (no mopping)",
+            "enum": [
+              "vacuum"
+            ]
+          }
+        ],
+        "description": "Vacuum only: mopping cleans vacuum instead."
       }
     }
   },

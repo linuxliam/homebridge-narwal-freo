@@ -28,7 +28,7 @@
       <div class="mb-2">
         <label for="password" class="form-label">Password</label>
         <input type="password" class="form-control" id="password" autocomplete="current-password" required>
-        <div class="hint mt-1">Saved in the plugin settings: Narwal sessions expire, and the plugin signs in again by itself.</div>
+        <div class="hint mt-1">Saved so the plugin can stay signed in.</div>
       </div>
       <div class="mb-3">
         <label for="region" class="form-label">Narwal cloud region</label>
@@ -50,10 +50,10 @@
   <h5 class="mb-2">Security system</h5>
   <div class="form-check form-switch mb-1">
     <input class="form-check-input" type="checkbox" role="switch" id="security-hold">
-    <label class="form-check-label" for="security-hold">Switch from Away to Stay while cleaning</label>
+    <label class="form-check-label" for="security-hold">Keep security from arming Away while cleaning</label>
   </div>
-  <p class="hint mb-2">Before cleaning, the robot asks armed security systems to switch to Home mode to avoid
-    false alarms. Works with supported plugins. <a href="https://github.com/seanfletchr/homebridge-narwal-freo/blob/main/docs/security-hold.md" target="_blank" rel="noopener">Learn more…</a></p>
+  <p class="hint mb-2">Keeps the robot from setting off the alarm: Away switches to Stay while it cleans and back
+    to Away when it's done. Works with supported security plugins. <a href="https://github.com/seanfletchr/homebridge-narwal-freo/blob/main/docs/security-hold.md" target="_blank" rel="noopener">Learn more…</a></p>
   <div id="security-provider-box" hidden>
     <label for="security-provider" class="form-label">Security system</label>
     <select class="form-select" id="security-provider"></select>
@@ -61,7 +61,42 @@
     <div class="mt-2" id="security-endpoint-box" hidden>
       <label for="security-endpoint" class="form-label">Endpoint</label>
       <input type="text" class="form-control" id="security-endpoint" placeholder="/path/to/control.sock or https://…">
-      <div class="hint mt-1">A Unix socket path or an http(s) URL answering the security hold API.</div>
+      <div class="hint mt-1">A socket path or URL for the security hold API.</div>
+    </div>
+    <div class="mt-3">
+      <label for="security-stopped-minutes" class="form-label">Back to Away when a robot stops moving for</label>
+      <div class="input-group" style="max-width: 12rem">
+        <input type="number" class="form-control" id="security-stopped-minutes" min="0" max="240" step="1" placeholder="10">
+        <span class="input-group-text">min</span>
+      </div>
+      <div class="hint mt-1">If the robot gets stuck or is paused mid-clean. 0: wait until cleaning ends.</div>
+    </div>
+  </div>
+</div>
+
+<div class="card card-body mb-3" id="vacation-card" hidden>
+  <h5 class="mb-2">Vacation mode</h5>
+  <div class="form-check form-switch mb-1">
+    <input class="form-check-input" type="checkbox" role="switch" id="vacation-mode">
+    <label class="form-check-label" for="vacation-mode">Enable Vacation Mode</label>
+  </div>
+  <p class="hint mb-2">Cuts back scheduled cleaning while Vacation Mode is on in the Home app. If no existing
+    vacation switch is found, one will be added automatically. <a href="https://github.com/seanfletchr/homebridge-narwal-freo#vacation-mode-optional" target="_blank" rel="noopener">Learn more…</a></p>
+  <div id="vacation-box" hidden>
+    <label for="vacation-switch" class="form-label">Switch name</label>
+    <input type="text" class="form-control" id="vacation-switch" placeholder="Vacation Mode" style="max-width: 20rem">
+    <div class="hint mt-1">As shown in Homebridge.</div>
+    <div class="mt-3">
+      <label for="vacation-cleans" class="form-label">Cleans allowed after it's turned on</label>
+      <input type="number" class="form-control" id="vacation-cleans" min="0" max="5" step="1" placeholder="1" style="max-width: 6rem">
+    </div>
+    <div class="mt-3">
+      <label for="vacation-after" class="form-label">After that</label>
+      <select class="form-select" id="vacation-after" style="max-width: 20rem">
+        <option value="none">No cleaning</option>
+        <option value="vacuum">Vacuum only (no mopping)</option>
+      </select>
+      <div class="hint mt-1">Vacuum only: mopping cleans vacuum instead.</div>
     </div>
   </div>
 </div>
@@ -80,9 +115,9 @@
   ];
   const CHOICES = {
     task: [['vacuum_and_mop', 'Vacuum and Mop'], ['vacuum_then_mop', 'Vacuum then Mop'], ['freo_mind', 'Freo Mind']],
-    passes: [['app', 'App'], ['1', '1'], ['2', '2'], ['3', '3']],
-    suction: [['app', 'App'], ['quiet', 'Quiet'], ['standard', 'Standard'], ['strong', 'Strong']],
-    water: [['app', 'App'], ['dry', 'Slightly dry'], ['standard', 'Standard'], ['wet', 'Slightly wet']],
+    passes: [['app', 'Default'], ['1', '1'], ['2', '2'], ['3', '3']],
+    suction: [['app', 'Default'], ['quiet', 'Quiet'], ['standard', 'Standard'], ['strong', 'Strong']],
+    water: [['app', 'Default'], ['dry', 'Slightly dry'], ['standard', 'Standard'], ['wet', 'Slightly wet']],
   };
   const el = (tag, props = {}, ...children) => {
     const node = Object.assign(document.createElement(tag), props);
@@ -171,7 +206,7 @@
     $('signin').hidden = signedIn;
     $('sign-in-cancel').hidden = !(block.email && block.password);
     $('signed-in-text').textContent = justSignedIn
-      ? `Signed in as ${block.email}. Save, then restart the bridge this plugin runs on.`
+      ? `Signed in as ${block.email}. Save, then restart this plugin's bridge.`
       : `Signed in as ${block.email ?? ''}.`;
     $('email').value = block.email ?? '';
     $('region').value = block.region ?? 'us';
@@ -248,13 +283,13 @@
     const rooms = robot.id ? status.rooms[robot.id] : undefined;
     if (rooms?.length) {
       return el('p', { className: 'mb-3' }, el('b', { textContent: 'Rooms: ' }), rooms.join(', '),
-        el('span', { className: 'hint d-block', textContent: 'Changed rooms in the Narwal app? Open the app on this '
-          + 'robot\'s map for a minute; the plugin picks up the new list within 6 hours.' }));
+        el('span', { className: 'hint d-block', textContent: 'Changed your rooms? Open this robot\'s map in the '
+          + 'Narwal app for a minute. The new rooms show up within 6 hours.' }));
     }
     return el('div', { className: 'alert alert-info mb-3', textContent: status.started
-      ? 'Waiting for the room list. Open the Narwal app on this robot\'s map for a minute: the robot only sends its '
-        + 'rooms while the app is open. The vacuum appears in Homebridge once they arrive.'
-      : 'Save and restart the bridge; then open the Narwal app on this robot\'s map for a minute so it sends its rooms.' });
+      ? 'Waiting for this robot\'s rooms. Open its map in the Narwal app for a minute; the vacuum appears in the '
+        + 'Home app once they arrive.'
+      : 'Save and restart this plugin\'s bridge, then open this robot\'s map in the Narwal app for a minute.' });
   }
 
   // The settings each Home app button's modes have.
@@ -330,9 +365,8 @@
         `${robot.name}, serial ${serial}, firmware ${robot.firmware}` }));
     }
     if (robot.supported === false) {
-      details.append(el('div', { className: 'alert alert-warning mt-2 mb-0', textContent: 'This doesn\'t look like the '
-        + 'original Narwal Freo (YJCC012), the only model this plugin supports. Newer Narwal robots use different '
-        + 'commands and won\'t work.' }));
+      details.append(el('div', { className: 'alert alert-warning mt-2 mb-0', textContent: 'This plugin only supports the '
+        + 'original Narwal Freo (YJCC012). This robot may not work.' }));
     }
     if (several) {
       details.append(el('div', { className: 'mt-3' }, switchRow('Show in the Home app', entry.enabled !== false, async on => {
@@ -355,9 +389,8 @@
 
     const modes = el('div', { className: 'mb-3' },
       el('b', { textContent: 'Clean modes' }),
-      el('p', { className: 'hint mb-1', textContent: 'The Home app offers Vacuum, Mop and a combined choice (named after '
-        + 'its Automatic task), each with Automatic, Quick and Deep Clean in its ⋯ menu; tapping the choice itself '
-        + 'picks Automatic. Choose what each does. "App" uses the settings saved for each room in the Narwal app.' }));
+      el('p', { className: 'hint mb-1', textContent: 'Choose what each clean mode in the Home app does. Default uses '
+        + 'each room\'s settings from the Narwal app.' }));
     for (const g of GROUPS) {
       modes.append(modeGroup(serial, entry, g));
     }
@@ -366,17 +399,16 @@
     const replace = el('input', { className: 'form-control', type: 'number', min: 0, max: 100, value: entry.replaceAtPercent ?? 10 });
     replace.addEventListener('change', () => setRobot(serial, e => { e.replaceAtPercent = Number(replace.value); }));
     const replaceBox = el('div', { className: 'mb-3 ms-4', hidden: !entry.consumables },
-      el('label', { className: 'form-label', textContent: 'Show "replace" at (% life left)' }), replace);
+      el('label', { className: 'form-label', textContent: 'Warn to replace at (% left)' }), replace);
     settings.append(
       switchRow('Cleaning sensor', Boolean(entry.cleaningSensor), on => setRobot(serial, e => { e.cleaningSensor = on; }),
-        'An occupancy sensor that\'s Detected while the robot is on a cleaning job (mop-wash visits to the dock '
-        + 'included), so Home app automations can react to cleaning. Needs this plugin\'s child bridge paired in the '
-        + 'Home app as well.'),
+        'Shows when the robot is cleaning, so Home app automations can react to it. Pair this plugin\'s bridge '
+        + 'in the Home app too.'),
       switchRow('Consumables', Boolean(entry.consumables), on => {
         replaceBox.hidden = !on;
         return setRobot(serial, e => { e.consumables = on; });
-      }, 'Remaining life of the filter, side brush, rolling brushes, mops and filter sponge, with a reset control. '
-        + 'Apple\'s Home app doesn\'t display these; use an app such as Eve or Controller.'),
+      }, 'Life left on the filter, brushes, mops and sponge. The Home app doesn\'t show these; use an app such as '
+        + 'Eve or Controller.'),
       replaceBox,
     );
     details.append(settings);
@@ -397,6 +429,7 @@
       box.append(robotCard(robot, entry, list.length > 1));
     }
     $('security-card').hidden = !(block.email && block.password);
+    $('vacation-card').hidden = !(block.email && block.password);
   }
 
   // ── Security ──
@@ -419,9 +452,10 @@
     select.value = block.securityEndpoint ? OTHER : block.securityPlugin ?? providers[0]?.name ?? OTHER;
     $('security-hold').checked = Boolean(block.securityHold);
     $('security-endpoint').value = block.securityEndpoint ?? '';
+    $('security-stopped-minutes').value = block.securityStoppedMinutes ?? 10;
     $('security-provider-hint').textContent = providers.length
-      ? 'Be sure this plugin is set to allow hold requests.'
-      : 'No installed plugin supports security holds.';
+      ? 'Make sure this plugin allows hold requests.'
+      : 'No installed security plugin supports this.';
     showSecurityFields();
   }
 
@@ -459,10 +493,52 @@
 
   $('security-endpoint').addEventListener('change', () => edit(saveProvider));
 
+  $('security-stopped-minutes').addEventListener('change', () => edit(block => {
+    const n = Math.round(Number($('security-stopped-minutes').value));
+    // Empty or invalid: back to the default (10).
+    block.securityStoppedMinutes = $('security-stopped-minutes').value === '' || !(n >= 0) ? undefined : Math.min(n, 240);
+    $('security-stopped-minutes').value = block.securityStoppedMinutes ?? 10;
+  }));
+
+  // ── Vacation mode ──
+
+  async function showVacation() {
+    const [block] = await configBlock();
+    $('vacation-mode').checked = Boolean(block.vacationMode);
+    $('vacation-switch').value = block.vacationSwitch ?? '';
+    $('vacation-cleans').value = block.vacationCleans ?? 1;
+    $('vacation-after').value = block.vacationAfter ?? 'none';
+    $('vacation-box').hidden = !block.vacationMode;
+  }
+
+  $('vacation-cleans').addEventListener('change', () => edit(block => {
+    const n = Math.round(Number($('vacation-cleans').value));
+    // Empty or invalid: back to the default (1).
+    block.vacationCleans = $('vacation-cleans').value === '' || !(n >= 0) ? undefined : Math.min(n, 5);
+    $('vacation-cleans').value = block.vacationCleans ?? 1;
+  }));
+
+  $('vacation-after').addEventListener('change', () => edit(block => {
+    block.vacationAfter = $('vacation-after').value === 'vacuum' ? 'vacuum' : undefined;
+  }));
+
+  $('vacation-mode').addEventListener('change', async () => {
+    $('vacation-box').hidden = !$('vacation-mode').checked;
+    await edit(block => {
+      block.vacationMode = $('vacation-mode').checked;
+    });
+  });
+
+  $('vacation-switch').addEventListener('change', () => edit(block => {
+    // Top-level key: undefined rather than deleted (the Homebridge UI merges them). Empty: the default name.
+    block.vacationSwitch = $('vacation-switch').value.trim() || undefined;
+  }));
+
   // ── Start ──
 
   await showAccount();
   await showSecurity();
+  await showVacation();
   const [saved] = await configBlock();
   if (saved.email && saved.password) {
     await showRobots();

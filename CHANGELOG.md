@@ -1,59 +1,37 @@
 # Changelog
 
+## 0.4.0
+
+- **Vacation mode** (`vacationMode`, `vacationSwitch`): follows a switch named "Vacation Mode" on
+  another bridge of the same Homebridge (a homebridge-dummy switch, for example). Once it's turned
+  on, the next cleans run as usual (`vacationCleans`, default 1) and later ones started from the Home
+  app are refused or run vacuum only (`vacationAfter`) until it's off.
+  Needs Homebridge's insecure mode (on by default). Without such a switch, the plugin adds its own
+  Vacation Mode switch to its child bridge (HomeKit side).
+- The security hold setting is now **Keep security from arming Away while cleaning** (still
+  `securityHold`). A hold is about keeping Away off while a robot works: Away asked for in the Home
+  app meanwhile waits until the robot is done (homebridge-ecobee-security's Arm Away Now switch
+  arms at once and sends it home), and Stay and Night aren't held back.
+- Security hold: the security plugin can stop a robot that's out when Away is armed in a way it
+  can't hold off (the ecobee app, a keypad). The plugin serves `POST /halt` on
+  `<storage>/narwal/control.sock` and sends it with each hold (`&halt=`). The robot heads back to its
+  base if it can be there before the exit delay ends (`&armAt=`, judged from its distance to the
+  base), and pauses where it is if it can't or isn't in 10 seconds before; without `armAt` it pauses
+  at once. Once it's in, or paused at the deadline, it tells the security plugin (`/release`), which
+  can extend the exit delay to wait for it. A paused robot asks for a new hold when it moves again.
+  Supported by homebridge-ecobee-security 0.6.0.
+- Security hold: the robot now releases after every hold the security plugin accepted, not only
+  when it held Stay, so the security plugin knows when it's done.
+- Security hold: a robot that stops away from its base mid-job (stuck, lifted, paused…) no longer
+  keeps the security system in Stay until someone frees it. The plugin now follows the robot's
+  position (`map/display_map`, in 5-cm map units); once it hasn't moved or turned for **Back to Away
+  when a robot stops moving for** (`securityStoppedMinutes`, default 10 minutes; 0 keeps the old
+  behaviour), it
+  releases its hold, and holds Stay again as soon as it moves. Time in the base (mop washes,
+  recharging) doesn't count.
+
 ## 0.3.1
 
+First public release.
+
 - Plugin icon in the README.
-
-## 0.3.0
-
-- **Several robots:** a `robots` list, each robot with its own name, clean modes, cleaning sensor and
-  consumables, published as its own Matter vacuum. Configs from 0.2.x still work, and the settings
-  page moves them into the list (the robot keeps its Matter pairing).
-- **Security hold for any security system:** security plugins declare the hold in their
-  package.json (`"homebridge-security-hold": { "socket": … }`, see the README); the settings page
-  lists the installed ones (`securityPlugin`), or `securityEndpoint` points at a socket or http(s)
-  URL. No security plugin is preferred any more. With several robots, Away comes back when the last
-  one is done.
-- New settings page, laid out like homebridge-ecobee-security's: sign in to Narwal (checked straight
-  away), then a card per robot with its rooms and collapsible clean-mode tables, and the security hold.
-- Clean modes set up the same way get their slot name in the label ("… (Quick)"): Matter needs unique
-  labels, and matter.js refused to publish the vacuum with two the same.
-- `cleanModes`: choose what each Home app clean mode does: passes, suction and water level for
-  every Vacuum / Mop / Vacuum + Mop slot, and the task (Vacuum and Mop, Vacuum then Mop, Freo Mind)
-  for the combined ones. The settings page groups them per Home app button.
-- Every Home app choice (Vacuum, Mop, combined) now has the same Automatic / Quick / Deep Clean,
-  with tapping the choice picking Automatic. The combined choice no longer has a separate button mode:
-  its Automatic is Narwal's one-pass **Vacuum and Mop** by default (Quick: 1 pass), Deep Clean is
-  Vacuum then Mop with 2 passes each, and **Freo Mind** is a task you can pick for any of the three.
-- `defaultCleanMode` is no longer in the settings (it only chose the mode for a robot's very first start,
-  before a mode is picked in the Home app); configs that set it still work, with slot names (`both`,
-  `vacuumQuick`, …) or the old values.
-- The robot's own job state drives the cleaning sensor and the security hold: they follow the
-  whole job, mop-wash visits to the dock included, and end the moment it does. `dockedMinutes` is
-  gone.
-- An idle robot on the dock showed as Stopped instead of Docked.
-- The battery level (and state) could stay at the start-up placeholder of 100% until it next
-  changed: statuses received before the vacuum was published were never sent.
-- The Home app's **Play Sound to Locate** now plays the robot's locate sound.
-- Consumables: resetting a part's filter indication (Eve and similar apps) resets its counter on
-  the robot, like the Narwal app's reset button.
-
-## 0.2.0
-
-- Renamed to `homebridge-narwal-freo`: only the original Narwal Freo (YJCC012) is supported.
-- `cleaningSensor`: an occupancy sensor that's Detected while the robot is away from the dock, for
-  Home app automations (the Home app can't trigger on a robot vacuum).
-- `consumables`: remaining life of the filter, side brush, rolling brushes, mops and filter sponge
-  as Filter Maintenance services, with "replace" at `replaceAtPercent`. Shown by apps such as Eve
-  and Controller; Apple's Home app doesn't display them.
-- `dockedMinutes` (replacing `securityReleaseMinutes`): how long the robot must stay on the dock
-  before the cleaning sensor and the security hold treat cleaning as finished.
-
-## 0.1.9
-
-- `securityHold`: switch homebridge-ecobee-security from Away to Stay while the robot cleans.
-
-## 0.1.8
-
-- First version used day to day: Matter robot vacuum with rooms, clean modes, start / pause /
-  return to dock, live errors and Siri.

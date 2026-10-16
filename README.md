@@ -34,6 +34,7 @@ Set it up from the plugin's settings page in the Homebridge UI:
   "Downstairs"), its rooms (or what to do to get them), its clean modes, the cleaning sensor and
   consumables. Each robot is its own Matter vacuum with its own pairing code.
 - **Security system:** the optional security hold (see below).
+- **Vacation mode:** cut back scheduled cleaning while a vacation switch is on (see below).
 
 The same settings in `config.json`:
 
@@ -49,6 +50,10 @@ The same settings in `config.json`:
   ],
   "securityHold": true,
   "securityPlugin": "homebridge-example-security",
+  "vacationMode": true,
+  "vacationSwitch": "Vacation Mode",
+  "vacationCleans": 1,
+  "vacationAfter": "vacuum",
   "_bridge": {
     "username": "…",
     "port": 51916,
@@ -59,8 +64,7 @@ The same settings in `config.json`:
 ```
 
 `disableIpv4` keeps Matter's mDNS off IPv4 so it doesn't compete with avahi, which advertises the
-HomeKit bridges. Configs from 0.2.x (one robot's settings at the top level, no `robots`) still
-work; opening the settings page moves them into `robots`.
+HomeKit bridges.
 
 ## Clean modes in the Home app
 
@@ -70,12 +74,12 @@ picks its Automatic. What each of these nine does is set in the plugin settings 
 
 | Home app | Automatic | Quick | Deep Clean |
 |---|---|---|---|
-| Vacuum | Narwal app settings | 1 pass | 2 passes |
-| Mop | Narwal app settings | 1 pass | 2 passes |
-| Combined | Vacuum and Mop (one pass doing both), Narwal app settings | Vacuum and Mop, 1 pass | Vacuum then Mop (a vacuum pass, then a mop pass), 2 passes each |
+| Vacuum | Default | 1 pass | 2 passes |
+| Mop | Default | 1 pass | 2 passes |
+| Combined | Vacuum and Mop (one pass doing both), Default | Vacuum and Mop, 1 pass | Vacuum then Mop (a vacuum pass, then a mop pass), 2 passes each |
 
 For each one you can set the passes (1–3), suction (quiet / standard / strong) and water level
-(slightly dry / standard / slightly wet), or leave them at **Narwal app settings**: the per-room
+(slightly dry / standard / slightly wet), or leave them at **Default**: the per-room
 settings saved in the Narwal app for that task. The combined ones also choose the task: Vacuum and
 Mop, Vacuum then Mop, or Freo Mind (the robot decides everything). If the Narwal app
 hasn't sent its settings for a task yet, standard suction and water are used and the log says so.
@@ -114,6 +118,36 @@ setup code); the vacuum keeps its own Matter pairing.
   app's "clean regularly" reminders (dust bin, base tray, sensors, caster wheel) have no counter
   and aren't shown.
 
+## Vacation mode (optional)
+
+Leaving for a trip right after tracking dirt in? With **`vacationMode`** on, the plugin follows a
+switch named **Vacation Mode** (`vacationSwitch` changes the name) on any bridge of the same
+Homebridge, for example a [homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) switch.
+When the switch is turned on, the next clean still runs as usual, so you come home to a clean house;
+after that, cleans started from the Home app (your scheduled automations included) are cut back until
+the switch is turned off, so an empty house isn't mopped every day. Your schedules stay as they are.
+
+- **`vacationCleans`** (default 1, up to 5): how many cleans still run as usual. 0: none.
+- **`vacationAfter`**: what happens to later cleans. `none` (default) refuses them; `vacuum` runs
+  them as vacuum-only cleans: Mop and Vacuum and Mop cleans vacuum instead, at the same Automatic,
+  Quick or Deep Clean, saving water and cleaning fluid while dust is still picked up.
+
+- A clean that's already running when the switch is turned on doesn't count; the next ones do.
+  Resuming a paused clean is always allowed.
+- Cleans started from the Narwal app or its own schedule aren't blocked (the plugin can't stop the
+  robot from starting them), but they count toward the allowed cleans.
+- The switch is read over HAP on the Homebridge machine every 30 seconds, which needs Homebridge's
+  insecure mode (Homebridge Settings, on by default; the Homebridge UI's accessory control uses it
+  too). Child bridges must have a fixed port (the Homebridge UI sets one). The log says which bridge
+  the switch was found on, or why it wasn't.
+- **No such switch?** If none turns up within 3 minutes of starting, the plugin adds its own
+  Vacation Mode switch to its child bridge's HomeKit side (pair that bridge in the Home app if you
+  haven't; the vacuum keeps its own Matter pairing).
+- The first switch used is kept for good, since your scenes and automations are built on it: once
+  the plugin has its own, it stops looking; once it follows one on another bridge, it never adds its
+  own and only looks on that bridge (while that bridge is down it keeps the last state). To start
+  over with another switch, turn vacation mode off and on again in the plugin settings.
+
 ## How it behaves
 
 - **Play Sound to Locate** in the Home app plays the robot's locate sound (the Narwal app's
@@ -137,8 +171,13 @@ setup code); the vacuum keeps its own Matter pairing.
   battery, sensor — with Narwal's message as the details. Codes not in the table are routine
   notices (e.g. 0x01010072 during mop runs) and are ignored. The cloud work status (polled every
   3 minutes) is only used when live status isn't arriving.
-- **Security hold** (`securityHold`, optional): switches a security system armed **Away** to
-  **Stay** while a robot cleans, so the motion sensors don't see it, and back to Away when the job is
-  done. Works with any security system plugin that offers the hold (the settings page lists the
-  installed ones) or anything else answering its API. See [docs/security-hold.md](docs/security-hold.md)
+- **Security hold** (`securityHold`, "Keep security from arming Away while cleaning", optional):
+  keeps a security system from arming **Away** while a robot cleans, so the motion sensors don't see
+  it. If it's armed Away when the robot starts it's switched to Stay, and Away comes back when the
+  job is done; Away asked for in the meantime waits, and if Away is armed anyway (say in the ecobee
+  app) the robot heads back to its base before the exit delay ends, or pauses where it is if it
+  can't make it. Stay and Night are not held back. Works with any security system plugin that offers the hold (the settings page lists the
+  installed ones) or anything else answering its API. A robot that stands still away from its base
+  for 10 minutes (`securityStoppedMinutes`) lets the system go back to Away, and asks for a new hold
+  as soon as it moves. See [docs/security-hold.md](docs/security-hold.md)
   for how it behaves, how to set it up, and the API for security plugin authors.
