@@ -18,6 +18,7 @@
   "keywords": [
     "homebridge-plugin",
     "supports-hap",
+    "supports-matter",
     "homebridge",
     "matter",
     "narwal",
