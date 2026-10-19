@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.4.1
+
+- Security hold: a clean started outside the Home app (Narwal app, its schedule, the robot's button), or a
+  stopped robot that starts moving again, is checked with the security system as soon as the robot
+  leaves its base (or moves). With the OK it carries on; if the security system can't be reached or
+  says no, the robot is paused and stays paused (resume it from the Home app). Before, a failed check
+  was only logged and the robot kept going.
+- Fixed: the robot showed as docked after being taken off its base (to empty the dustbin), and
+  Return to dock did nothing. A robot that reports being out of its base now shows as stopped, and
+  Return to dock checks the robot's current status instead of the tile.
+- Return to dock asks for the security hold before the robot sets off, like a clean, unless the
+  robot's hold is still in force (a clean that got the OK and hasn't released it; a stuck robot's
+  hold is released after it stands still): the trip home passes the motion sensors, so if the
+  security system can't be reached (or says no) the robot stays where it is. A trip home ordered by
+  the security plugin itself (Away being armed) doesn't ask either. It was logged as "Cleaning started outside the Home app".
+- Cleans started outside the Home app are only checked once the robot leaves its base, not for what
+  it reports while in it (the end of a trip home looked like a start).
+- Fixed false "Battery: sent …% but the vacuum reports …%" warnings: the check read the value back
+  before Homebridge had applied it (the Home app always got the right level). It now waits for it.
+- After Return to dock the plugin checks that the robot set off; a robot with an error to clear
+  (a jammed brush, say) can ignore it, and the log now says so instead of the tile showing it on
+  its way home.
+
 ## 0.4.0
 
 - **Vacation mode** (`vacationMode`, `vacationSwitch`): follows a switch named "Vacation Mode" on

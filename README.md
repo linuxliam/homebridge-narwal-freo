@@ -155,6 +155,10 @@ system to switch from Away to **Home** before it starts, so it can clean safely.
 stay armed. When the robot is done, the system goes back to Away. If Away is armed while the robot is
 cleaning, it heads back to its base, or pauses where it is if it can't make it in time.
 
+Cleans started outside the Home app (the Narwal app, its schedules, the robot's button) are checked
+with the security system as the robot leaves its base; without its OK the robot is paused and stays
+paused.
+
 It needs a security system plugin that supports this, such as
 [homebridge-ecobee-security](https://github.com/seanfletchr/homebridge-ecobee-security). Setup,
 what happens in each situation, and the API for other plugins:
