@@ -27,7 +27,7 @@ With homebridge-ecobee-security (another security plugin may handle some of thes
 
 | Situation | What happens |
 |---|---|
-| The robot starts cleaning while the system is armed **Away** (from the Home app, Siri or an automation) | The system switches to Home. When the cleaning job ends, it's armed Away again with the normal countdown. Trips back to the base to wash the mops don't end the job. |
+| The robot starts cleaning while the system is armed **Away** (from the Home app, Siri or an automation) | The system switches to Home. When the cleaning job ends, it's armed Away again. Trips back to the base to wash the mops don't end the job. |
 | A clean starts **outside the Home app** (the Narwal app, a schedule set there, or the robot's button) | As the robot leaves its base, the plugin asks the security system (about a second). With the OK the robot carries on; if the security system can't be reached or says no, the robot is paused and stays paused; resume it from the Home app once that's sorted. The same applies when a robot that stopped moving starts moving again. |
 | The robot starts while the system is in **Home**, **Night** or **Off** | Nothing changes. |
 | The robot gets stuck, is picked up or is paused mid-job | Once it hasn't moved for 10 minutes, the system goes back to Away. As soon as it moves again, the system switches back to Home within a couple of seconds. |

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.2
+
+- The log now shows a short report when each clean ends: why it ended (finished, stopped,
+  battery too low, …), how much was done, the area and the time.
+- Settings page: Vacation mode now comes before Security hold (renamed from Security system).
+- The vacation switch name is no longer a setting: it's always "Vacation Mode". An existing setting
+  keeps working.
+- Vacation mode: after the vacation switch's bridge restarts, the switch is found again within
+  30 seconds (it could take up to 10 minutes), and the log says it's back.
+- README: header and device images, and badges.
+
 ## 0.4.1
 
 - Security hold: a clean started outside the Home app (Narwal app, its schedule, the robot's button), or a

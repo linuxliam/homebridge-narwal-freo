@@ -46,8 +46,32 @@
 
 <div id="robots"></div>
 
+<div class="card card-body mb-3" id="vacation-card" hidden>
+  <h5 class="mb-2">Vacation mode</h5>
+  <div class="form-check form-switch mb-1">
+    <input class="form-check-input" type="checkbox" role="switch" id="vacation-mode">
+    <label class="form-check-label" for="vacation-mode">Enable Vacation Mode</label>
+  </div>
+  <p class="hint mb-2">Cuts back scheduled cleaning while Vacation Mode is on in the Home app. If no existing
+    vacation switch is found, one will be added automatically. <a href="https://github.com/seanfletchr/homebridge-narwal-freo#vacation-mode-optional" target="_blank" rel="noopener">Learn more…</a></p>
+  <div id="vacation-box" hidden>
+    <div>
+      <label for="vacation-cleans" class="form-label">Cleans allowed after it's turned on</label>
+      <input type="number" class="form-control" id="vacation-cleans" min="0" max="5" step="1" placeholder="1" style="max-width: 6rem">
+    </div>
+    <div class="mt-3">
+      <label for="vacation-after" class="form-label">After that</label>
+      <select class="form-select" id="vacation-after" style="max-width: 20rem">
+        <option value="none">No cleaning</option>
+        <option value="vacuum">Vacuum only (no mopping)</option>
+      </select>
+      <div class="hint mt-1">Vacuum only: mopping cleans vacuum instead.</div>
+    </div>
+  </div>
+</div>
+
 <div class="card card-body mb-3" id="security-card" hidden>
-  <h5 class="mb-2">Security system</h5>
+  <h5 class="mb-2">Security hold</h5>
   <div class="form-check form-switch mb-1">
     <input class="form-check-input" type="checkbox" role="switch" id="security-hold">
     <label class="form-check-label" for="security-hold">Keep security from arming Away while cleaning</label>
@@ -70,33 +94,6 @@
         <span class="input-group-text">min</span>
       </div>
       <div class="hint mt-1">If the robot gets stuck or is paused mid-clean. 0: wait until cleaning ends.</div>
-    </div>
-  </div>
-</div>
-
-<div class="card card-body mb-3" id="vacation-card" hidden>
-  <h5 class="mb-2">Vacation mode</h5>
-  <div class="form-check form-switch mb-1">
-    <input class="form-check-input" type="checkbox" role="switch" id="vacation-mode">
-    <label class="form-check-label" for="vacation-mode">Enable Vacation Mode</label>
-  </div>
-  <p class="hint mb-2">Cuts back scheduled cleaning while Vacation Mode is on in the Home app. If no existing
-    vacation switch is found, one will be added automatically. <a href="https://github.com/seanfletchr/homebridge-narwal-freo#vacation-mode-optional" target="_blank" rel="noopener">Learn more…</a></p>
-  <div id="vacation-box" hidden>
-    <label for="vacation-switch" class="form-label">Switch name</label>
-    <input type="text" class="form-control" id="vacation-switch" placeholder="Vacation Mode" style="max-width: 20rem">
-    <div class="hint mt-1">As shown in Homebridge.</div>
-    <div class="mt-3">
-      <label for="vacation-cleans" class="form-label">Cleans allowed after it's turned on</label>
-      <input type="number" class="form-control" id="vacation-cleans" min="0" max="5" step="1" placeholder="1" style="max-width: 6rem">
-    </div>
-    <div class="mt-3">
-      <label for="vacation-after" class="form-label">After that</label>
-      <select class="form-select" id="vacation-after" style="max-width: 20rem">
-        <option value="none">No cleaning</option>
-        <option value="vacuum">Vacuum only (no mopping)</option>
-      </select>
-      <div class="hint mt-1">Vacuum only: mopping cleans vacuum instead.</div>
     </div>
   </div>
 </div>
@@ -505,7 +502,6 @@
   async function showVacation() {
     const [block] = await configBlock();
     $('vacation-mode').checked = Boolean(block.vacationMode);
-    $('vacation-switch').value = block.vacationSwitch ?? '';
     $('vacation-cleans').value = block.vacationCleans ?? 1;
     $('vacation-after').value = block.vacationAfter ?? 'none';
     $('vacation-box').hidden = !block.vacationMode;
@@ -528,11 +524,6 @@
       block.vacationMode = $('vacation-mode').checked;
     });
   });
-
-  $('vacation-switch').addEventListener('change', () => edit(block => {
-    // Top-level key: undefined rather than deleted (the Homebridge UI merges them). Empty: the default name.
-    block.vacationSwitch = $('vacation-switch').value.trim() || undefined;
-  }));
 
   // ── Start ──
 

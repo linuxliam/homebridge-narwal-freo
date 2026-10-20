@@ -1022,13 +1022,6 @@
         "default": false,
         "description": "Cuts back scheduled cleaning while Vacation Mode is on in the Home app. If no existing vacation switch is found, one will be added automatically. See https://github.com/seanfletchr/homebridge-narwal-freo#vacation-mode-optional"
       },
-      "vacationSwitch": {
-        "title": "Vacation switch name",
-        "type": "string",
-        "default": "Vacation Mode",
-        "placeholder": "Vacation Mode",
-        "description": "The name of the switch to follow, as shown in Homebridge (case and spaces don't matter)."
-      },
       "vacationCleans": {
         "title": "Cleans allowed after vacation mode is turned on",
         "type": "integer",

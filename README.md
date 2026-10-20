@@ -2,6 +2,13 @@
 
 # homebridge-narwal-freo
 
+<p align="center">
+  <a href="https://github.com/homebridge/homebridge/wiki/Verified-Plugins"><img src="https://img.shields.io/badge/homebridge-verified-blueviolet?color=%23491F59&style=flat" alt="Verified by Homebridge"></a>
+  <a href="https://www.npmjs.com/package/homebridge-narwal-freo"><img src="https://img.shields.io/npm/v/homebridge-narwal-freo?label=npm%40latest" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/homebridge-narwal-freo"><img src="https://img.shields.io/npm/d18m/homebridge-narwal-freo" alt="npm downloads"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/npm/l/homebridge-narwal-freo" alt="license"></a>
+</p>
+
 Shows the original **Narwal Freo** (model YJCC012 / product group J3) in Apple Home as a
 native **robot vacuum** over Matter: start, pause, resume, return to dock, clean mode
 (Vacuum & Mop, Vacuum, Mop, Vacuum then Mop, Freo Mind), room selection, and battery/charging state. Optionally adds a **Cleaning** sensor for Home app automations and the
@@ -53,7 +60,6 @@ The same settings in `config.json`:
   "securityHold": true,
   "securityPlugin": "homebridge-example-security",
   "vacationMode": true,
-  "vacationSwitch": "Vacation Mode",
   "vacationCleans": 1,
   "vacationAfter": "vacuum",
   "_bridge": {
@@ -127,12 +133,12 @@ cuts back cleaning while you're gone. The next clean still runs, so you come hom
 After that, cleans started from the Home app, including your scheduled automations, are skipped (or
 run vacuum only) until you turn the switch off. Your schedules stay as they are.
 
-The plugin uses your existing "Vacation Mode" switch if you have one on this Homebridge (a
-[homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) switch, for example), and adds one
+The plugin follows a switch named "Vacation Mode" if you have one on this Homebridge (on another
+bridge: [homebridge-ecobee-security](https://github.com/seanfletchr/homebridge-ecobee-security)'s, or a
+[homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) switch, for example), and adds its own
 if you don't. The added switch is on the plugin's bridge, so add that bridge to the Home app if you
 haven't (the vacuum keeps its own Matter pairing).
 
-- **`vacationSwitch`**: the switch's name (default "Vacation Mode").
 - **`vacationCleans`** (default 1, up to 5): how many cleans still run as usual. 0: none.
 - **`vacationAfter`**: what happens to later cleans: `none` (default) skips them, `vacuum` runs them
   vacuum only, at the same Automatic, Quick or Deep Clean, saving water while still picking up dust.
