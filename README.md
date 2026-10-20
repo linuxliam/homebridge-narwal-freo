@@ -1,4 +1,4 @@
-<p align="center"><img src="icon.png" alt="" width="100" height="100"></p>
+<p align="center"><img src="narwal-header.png" alt="Homebridge and Narwal" width="100%"></p>
 
 # homebridge-narwal-freo
 
@@ -6,6 +6,8 @@ Shows the original **Narwal Freo** (model YJCC012 / product group J3) in Apple H
 native **robot vacuum** over Matter: start, pause, resume, return to dock, clean mode
 (Vacuum & Mop, Vacuum, Mop, Vacuum then Mop, Freo Mind), room selection, and battery/charging state. Optionally adds a **Cleaning** sensor for Home app automations and the
 **consumables'** remaining life.
+
+<p align="center"><img src="narwal-devices.png" alt="The Narwal Freo robot vacuum" width="100%"></p>
 
 **Only the original Freo is supported.** Newer Narwal robots (Freo X, Freo Z, …) use different
 message formats and won't work.
