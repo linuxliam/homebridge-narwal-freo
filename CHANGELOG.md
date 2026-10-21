@@ -2,6 +2,9 @@
 
 ## 0.6.0 (unreleased)
 
+- Rooms the Narwal app shows by type now get the app's names (Bathroom, Hallway, Toilet, Closet, …);
+  some were wrong before, e.g. a bathroom was called Study. Room numbers are unchanged, so scenes and
+  automations keep working, but Siri and the Home app use the new names.
 - Multiple floors: every map saved on the robot is published, with its rooms. The Home app shows a
   Cleaning Map picker; rooms of the main map keep their ids, so existing scenes and automations keep
   working, and other maps' rooms use `map id * 1000 + room id`. Starting a clean on another floor
