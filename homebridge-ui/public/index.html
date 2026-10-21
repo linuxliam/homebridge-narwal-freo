@@ -280,13 +280,13 @@
     const rooms = robot.id ? status.rooms[robot.id] : undefined;
     if (rooms?.length) {
       return el('p', { className: 'mb-3' }, el('b', { textContent: 'Rooms: ' }), rooms.join(', '),
-        el('span', { className: 'hint d-block', textContent: 'Changed your rooms? Open this robot\'s map in the '
-          + 'Narwal app for a minute. The new rooms show up within 6 hours.' }));
+        el('span', { className: 'hint d-block', textContent: 'Changed your rooms in the Narwal app? The new rooms '
+          + 'show up within 6 hours, or when you restart the bridge.' }));
     }
     return el('div', { className: 'alert alert-info mb-3', textContent: status.started
-      ? 'Waiting for this robot\'s rooms. Open its map in the Narwal app for a minute; the vacuum appears in the '
-        + 'Home app once they arrive.'
-      : 'Save and restart this plugin\'s bridge, then open this robot\'s map in the Narwal app for a minute.' });
+      ? 'Waiting for this robot\'s rooms. The vacuum appears in the Home app once they arrive; if it takes more '
+        + 'than a few minutes, check that the robot is online and has a saved map.'
+      : 'Save and restart this plugin\'s bridge; the robot\'s rooms load by themselves.' });
   }
 
   // The settings each Home app button's modes have.

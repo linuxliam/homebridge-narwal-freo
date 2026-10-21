@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- Rooms and cleaning plans now load by themselves. The robot only answers requests that look exactly like
+  the Narwal app's, so before, they arrived only while the Narwal app was open; the plugin now asks the
+  way the app does, at start and then every 6 hours. You no longer need to open the Narwal app on the map.
+- Robots with more than one map (for example an upstairs map without a base station): the vacuum
+  keeps the rooms of the map with the base station. Opening another map in the Narwal app no longer
+  swaps the room list, and cleaning plans from another map are ignored.
+- The log warns when the robot refuses a command (start, pause, resume, return to dock, stop, locate,
+  consumable reset) or doesn't answer within 5 seconds.
+
 ## 0.4.2
 
 - The log now shows a short report when each clean ends: why it ended (finished, stopped,

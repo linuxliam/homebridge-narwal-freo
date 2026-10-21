@@ -89,7 +89,7 @@ picks its Automatic. What each of these nine does is set in the plugin settings 
 For each one you can set the passes (1–3), suction (quiet / standard / strong) and water level
 (slightly dry / standard / slightly wet), or leave them at **Default**: the per-room
 settings saved in the Narwal app for that task. The combined ones also choose the task: Vacuum and
-Mop, Vacuum then Mop, or Freo Mind (the robot decides everything). If the Narwal app
+Mop, Vacuum then Mop, or Freo Mind (the robot decides everything). If the robot
 hasn't sent its settings for a task yet, standard suction and water are used and the log says so.
 
 ```json
@@ -176,18 +176,19 @@ what happens in each situation, and the API for other plugins:
 
 - **Play Sound to Locate** in the Home app plays the robot's locate sound (the Narwal app's
   "Locate robot").
-- **Rooms:** the Freo only sends its saved map (room names) and the app's cleaning plans while the
-  **Narwal app is open**. On first start, open the app on the Freo's map for a minute; the vacuum
-  is published once the rooms arrive. Rooms and plans are cached in
-  `<homebridge storage>/narwal/state.json` (mode 600, also holds the session tokens), and the
-  plugin re-requests them every 6 hours, so room changes made in the app show up next time the app is open.
+- **Rooms:** the plugin asks the robot for its saved maps and the Narwal app's cleaning plans by
+  itself; the Narwal app doesn't need to be open. The vacuum is published once the rooms arrive.
+  If the robot has several maps, the rooms are those of the map with the base station. Rooms and
+  plans are cached in `<homebridge storage>/narwal/state.json` (mode 600, also holds the session
+  tokens), and the plugin re-requests them every 6 hours and when the robot's map changes, so room
+  changes made in the app show up on their own.
 - **Clean settings:** each start uses the app's saved per-room template for the chosen mode, so
   suction, water level and passes follow what's set in the Narwal app.
 - **No room selected** in the Home app means all rooms.
 - **Freo Mind** needs the app's plan; without it the plugin refuses instead of guessing.
 - **Status:** the plugin keeps the robot publishing status (the same "app open" heartbeat the
-  Narwal app sends, every 5 minutes). Commands aren't acknowledged by the Freo; the state the robot
-  reports a second or two later is what the Home app shows.
+  Narwal app sends, every 5 minutes). The robot confirms each command; the log warns if it refuses
+  one or doesn't answer. The state the robot reports a second or two later is what the Home app shows.
 - **Errors** come from the robot's live status (field 1 of `robot_base_status`), so the Home app
   shows them within seconds and clears them when fixed. `lib/errors.js` maps Narwal's 225 codes
   (generated from Narwal's published error table v1.0.10) to Matter errors — water tank
