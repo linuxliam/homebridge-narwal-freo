@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.6.0 (unreleased)
+
+- Multiple floors: every map saved on the robot is published, with its rooms. The Home app shows a
+  Cleaning Map picker; rooms of the main map keep their ids, so existing scenes and automations keep
+  working, and other maps' rooms use `map id * 1000 + room id`. Starting a clean on another floor
+  switches the robot's map first and checks it, sets that floor's stair detection and checks that too,
+  then does the security check and starts. A step the robot refuses or doesn't answer means no start,
+  and the tile shows an error. The rooms you last picked are remembered even if the Home app was told
+  they were refused, and a selection that isn't clean is refused rather than turned into a clean of
+  everything.
+- Stair detection per floor (on by default for every floor of a robot with several maps; a robot with
+  one map is left alone unless you choose a value). A job running on a floor that needs it while the
+  robot has it off is paused, with an error on the tile; Resume turns it back on.
+- Cleaning plans are kept per map, and a plan is only used for rooms of its own map.
+- Return to dock on a floor without a base station goes to the map's starting point; if the robot
+  refuses or doesn't set off, the clean is ended and the tile shows an error. The robot shows as
+  Stopped, not Docked, when it isn't on a base. Halts for the security system are timed to the
+  starting point on such floors.
+- Settings: floor and room names for the Home app, and stair detection per floor (`maps` in a
+  robot's settings), listed on the settings page from the maps the robot reports.
+- The robot's state file now keeps every map (`maps`, `plansByMap`); an older one is converted on
+  start.
+
 ## Unreleased
 
 - Rooms and cleaning plans now load by themselves. The robot only answers requests that look exactly like

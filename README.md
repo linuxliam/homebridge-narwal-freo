@@ -40,7 +40,8 @@ Set it up from the plugin's settings page in the Homebridge UI:
 - **Narwal account:** sign in with the email and password you use in the Narwal app. The page checks
   them with Narwal straight away and lists the robots on the account.
 - **One card per robot:** whether it shows in the Home app, its name (e.g. "Upstairs" and
-  "Downstairs"), its rooms (or what to do to get them), its clean modes, the cleaning sensor and
+  "Downstairs"), its floors and rooms (or what to do to get them) with the names the Home app
+  shows, stair detection per floor, its clean modes, the cleaning sensor and
   consumables. Each robot is its own Matter vacuum with its own pairing code.
 - **Security system:** the optional security hold (see below).
 - **Vacation mode:** cut back scheduled cleaning while a vacation switch is on (see below).
@@ -54,7 +55,11 @@ The same settings in `config.json`:
   "email": "you@example.com",
   "password": "…",
   "robots": [
-    { "serialNumber": "YA3…", "name": "Downstairs", "cleaningSensor": true, "consumables": true },
+    { "serialNumber": "YA3…", "name": "Downstairs", "cleaningSensor": true, "consumables": true,
+      "maps": [
+        { "id": 1, "stairDetection": false },
+        { "id": 2, "name": "Upstairs", "rooms": [{ "id": 4, "name": "Hallway" }] }
+      ] },
     { "serialNumber": "YA4…", "name": "Upstairs", "cleanModes": { "both": { "task": "vacuum_then_mop" } } }
   ],
   "securityHold": true,
@@ -104,6 +109,44 @@ The vacuum must offer the clean mode it reports as current, or matter.js won't p
 mode number is never dropped without mapping it to one that stays (see `RETIRED_MODES` in
 `lib/vacuum.js`). Labels must be unique too: two slots set up the same get their slot name, e.g.
 "Mop, 1 pass (Quick)".
+
+## Multiple floors
+
+A Freo can keep several maps, one per floor. The plugin publishes all of them: the Home app shows a
+**Cleaning Map** picker, and each floor's rooms. Pick rooms on one floor and start; the plugin does
+the rest:
+
+1. It switches the robot to that floor's map and checks the robot says it is on it.
+2. It sets **stair detection** for that floor and checks the robot kept it.
+3. It asks the security system for its OK (if the security hold is on), then starts the clean.
+
+If any step is refused or not answered, nothing starts and the Home app tile shows an error
+("Unable to start or resume"), so you never need the log. Carry the robot to the floor first: it
+finds its place on the map from where it stands. A robot put on the wrong floor reports "Robot
+positioning failed" after a few minutes.
+
+- **Names:** the settings page lists each map and its rooms. Give a floor or a room another name for
+  the Home app (say "Corridor" upstairs becomes "Hallway"); leave it empty to keep Narwal's.
+  Matter needs the names to be different, so equal ones get a number added.
+- **Stair detection** is on for every floor by default, because a robot that doesn't know about
+  stairs can drive down them. Turn it off only for floors with no stairs going down: with it on,
+  dark floors and toe kicks can cause false "robot is stuck" errors. It is a robot-wide setting in the
+  Narwal app, so the plugin sets it again before every clean, and if something else turns it off
+  while the robot cleans a floor that needs it, the robot is paused (the tile shows an error;
+  Resume turns it back on). A robot with a single map is left alone unless you choose a value.
+- **Return to dock** on a floor without a base station sends the robot back to its starting point
+  (the "P" on the map in the Narwal app). If the robot refuses or doesn't set off within 20
+  seconds, the plugin ends the clean and the tile shows "Unable to find charging dock". When the
+  security hold sends the robot home because Away is being armed, it is timed to that starting point.
+- **Existing scenes and automations keep working:** the main map's rooms keep the ids they had,
+  other maps' rooms use `map id * 1000 + room id`.
+- **Cleaning plans** (your per-room settings from the Narwal app) are kept per map, and each clean
+  uses the plan of its own floor.
+- Keep scheduling in Home app automations, not in the Narwal app: a schedule started by the app can't
+  be changed by the plugin.
+
+In `config.json`, a robot's `maps` lists the entries you changed (`id` is the map's number on the
+robot; room `id` is the room's number on that map); the settings page writes them for you.
 
 ## Cleaning sensor and consumables (optional)
 
@@ -178,7 +221,7 @@ what happens in each situation, and the API for other plugins:
   "Locate robot").
 - **Rooms:** the plugin asks the robot for its saved maps and the Narwal app's cleaning plans by
   itself; the Narwal app doesn't need to be open. The vacuum is published once the rooms arrive.
-  If the robot has several maps, the rooms are those of the map with the base station. Rooms and
+  Every saved map is published (see Multiple floors). Rooms and
   plans are cached in `<homebridge storage>/narwal/state.json` (mode 600, also holds the session
   tokens), and the plugin re-requests them every 6 hours and when the robot's map changes, so room
   changes made in the app show up on their own.

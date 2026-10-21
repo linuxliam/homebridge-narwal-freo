@@ -1,12 +1,13 @@
 // Server side of the plugin's settings page (spawned by the Homebridge UI while the settings are
 // open). Checks a Narwal sign-in and lists the account's robots, and reports what the running plugin
-// has saved (rooms), so the page can show where setup stands. Nothing here is kept.
+// has saved (maps and rooms), so the page can show where setup stands. Nothing here is kept.
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { HomebridgePluginUiServer, RequestError } from '@homebridge/plugin-ui-utils';
 
 import { NarwalCloud } from '../lib/cloud.js';
+import { savedMaps } from '../lib/floors.js';
 import { findSecurityProviders } from '../lib/security-providers.js';
 import { DEFAULT_CLEAN_MODES } from '../lib/vacuum.js';
 
@@ -48,19 +49,19 @@ class UiServer extends HomebridgePluginUiServer {
     this.onRequest('/security-providers', () =>
       findSecurityProviders(this.homebridgeStoragePath).map(({ name, displayName }) => ({ name, displayName })));
 
-    // What the running plugin has saved: each robot's rooms, by device ID (no tokens leave this process).
+    // What the running plugin has saved: each robot's maps and rooms, by device ID (no tokens leave this process).
     this.onRequest('/status', async () => {
       let store;
       try {
         store = JSON.parse(await readFile(join(this.homebridgeStoragePath, 'narwal', 'state.json'), 'utf8'));
       } catch {
-        return { started: false, rooms: {} };
+        return { started: false, maps: {} };
       }
       // Up to 0.2.x the plugin kept one robot's state at the top level.
       const robots = store.robots ?? (store.deviceId ? { [store.deviceId]: store } : {});
       return {
         started: true,
-        rooms: Object.fromEntries(Object.entries(robots).map(([id, r]) => [id, (r.rooms ?? []).map(room => room.name)])),
+        maps: Object.fromEntries(Object.entries(robots).map(([id, r]) => [id, savedMaps(r)])),
       };
     });
 

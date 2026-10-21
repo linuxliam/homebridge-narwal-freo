@@ -8,6 +8,8 @@
   .modes td, .modes th { vertical-align: middle; }
   .modes select { min-width: 7em; }
   .modes select.task { min-width: 11.5em; }
+  .floor { border-top: 1px solid rgba(128, 128, 128, 0.3); padding-top: 0.75rem; margin-top: 0.75rem; }
+  .floor .room-name { max-width: 16rem; }
 </style>
 
 <div class="card card-body mb-3">
@@ -255,7 +257,7 @@
   // ── Robots ──
 
   const defaults = await homebridge.request('/clean-mode-defaults');
-  const status = await homebridge.request('/status').catch(() => ({ started: false, rooms: {} }));
+  const status = await homebridge.request('/status').catch(() => ({ started: false, maps: {} }));
 
   function switchRow(label, checked, onChange, hint) {
     const id = `sw-${Math.random().toString(36).slice(2)}`;
@@ -276,17 +278,84 @@
     return s;
   }
 
-  function roomsBlock(robot) {
-    const rooms = robot.id ? status.rooms[robot.id] : undefined;
-    if (rooms?.length) {
-      return el('p', { className: 'mb-3' }, el('b', { textContent: 'Rooms: ' }), rooms.join(', '),
-        el('span', { className: 'hint d-block', textContent: 'Changed your rooms in the Narwal app? The new rooms '
-          + 'show up within 6 hours, or when you restart the bridge.' }));
+  /** Change one map's entry in a robot's `maps` setting; entries left with nothing to say are dropped. */
+  function setMap(serial, mapId, fn) {
+    return edit(block => {
+      const entry = robotEntry(block, serial);
+      const list = entry.maps ?? [];
+      const map = list.find(m => Number(m.id) === mapId) ?? { id: mapId };
+      fn(map);
+      map.rooms = (map.rooms ?? []).filter(r => r.name);
+      if (!map.rooms.length) {
+        delete map.rooms;
+      }
+      const rest = list.filter(m => m !== map);
+      const keep = Object.keys(map).some(k => k !== 'id');
+      entry.maps = keep ? [...rest, map] : rest;
+      if (!entry.maps.length) {
+        delete entry.maps;
+      }
+    });
+  }
+
+  /** Text field that saves its value (empty: back to the default) when it changes. */
+  function nameField(value, placeholder, save, className = '') {
+    const input = el('input', { className: `form-control form-control-sm ${className}`, type: 'text', value: value ?? '', placeholder });
+    input.addEventListener('change', () => save(input.value.trim()));
+    return input;
+  }
+
+  /** One saved map: its name, stair detection and rooms. */
+  function floorBlock(serial, entry, map, several) {
+    const saved = entry.maps?.find(m => Number(m.id) === map.id) ?? {};
+    const rooms = el('div', { className: 'mt-2' });
+    for (const room of map.rooms) {
+      const chosen = saved.rooms?.find(r => Number(r.id) === room.id)?.name;
+      rooms.append(el('div', { className: 'd-flex align-items-center gap-2 mb-1' },
+        el('span', { className: 'hint', style: 'min-width: 9rem', textContent: room.name }),
+        nameField(chosen, 'Name in the Home app', name => setMap(serial, map.id, m => {
+          m.rooms = (m.rooms ?? []).filter(r => Number(r.id) !== room.id);
+          if (name) {
+            m.rooms.push({ id: room.id, name });
+          }
+        }), 'room-name')));
     }
-    return el('div', { className: 'alert alert-info mb-3', textContent: status.started
-      ? 'Waiting for this robot\'s rooms. The vacuum appears in the Home app once they arrive; if it takes more '
-        + 'than a few minutes, check that the robot is online and has a saved map.'
-      : 'Save and restart this plugin\'s bridge; the robot\'s rooms load by themselves.' });
+    const block = el('div', { className: 'floor' },
+      el('div', { className: 'mb-2' }, el('label', { className: 'form-label mb-1', textContent: 'Name in the Home app' }),
+        nameField(saved.name, map.name, name => setMap(serial, map.id, m => {
+          if (name) { m.name = name; } else { delete m.name; }
+        }), 'room-name')));
+    if (several) {
+      block.append(switchRow('Stair detection', saved.stairDetection !== false,
+        on => setMap(serial, map.id, m => { if (on) { delete m.stairDetection; } else { m.stairDetection = false; } }),
+        'Only turn this off on floors with no stairs going down.'));
+    }
+    if (!map.hasDock) {
+      block.append(el('p', { className: 'hint mb-2', textContent: 'No base station on this floor.' }));
+    }
+    block.append(el('b', { textContent: 'Rooms' }), rooms);
+    return block;
+  }
+
+  function roomsBlock(robot, entry) {
+    const maps = robot.id ? status.maps?.[robot.id] : undefined;
+    if (!maps?.length) {
+      return el('div', { className: 'alert alert-info mb-3', textContent: status.started
+        ? 'Waiting for this robot\'s rooms. The vacuum appears in the Home app once they arrive; if it takes more '
+          + 'than a few minutes, check that the robot is online and has a saved map.'
+        : 'Save and restart this plugin\'s bridge; the robot\'s rooms load by themselves.' });
+    }
+    const several = maps.length > 1;
+    const box = el('div', { className: 'mb-3' },
+      el('b', { textContent: several ? 'Floors' : 'Rooms' }),
+      el('p', { className: 'hint mb-0', textContent: 'Change the names the Home app shows. Changed your maps in the Narwal '
+        + 'app? They show up here within 6 hours, or when you restart the bridge.' }));
+    for (const map of maps) {
+      box.append(several ? el('details', { className: 'floor', open: false },
+        el('summary', { textContent: map.name }), floorBlock(robot.serial, entry, map, several))
+        : floorBlock(robot.serial, entry, map, several));
+    }
+    return box;
   }
 
   // The settings each Home app button's modes have.
@@ -381,7 +450,7 @@
     settings.append(
       el('div', { className: 'mb-3' }, el('label', { className: 'form-label', textContent: 'Name in the Home app' }), name,
         el('div', { className: 'hint mt-1', textContent: 'For example "Upstairs" and "Downstairs" in a home with two robots.' })),
-      roomsBlock(robot),
+      roomsBlock(robot, entry),
     );
 
     const modes = el('div', { className: 'mb-3' },

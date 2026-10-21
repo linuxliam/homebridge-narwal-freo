@@ -58,6 +58,51 @@
               "type": "string",
               "description": "Defaults to the robot's name in the Narwal app."
             },
+            "maps": {
+              "title": "Floors",
+              "type": "array",
+              "description": "Names and stair detection for the maps saved on the robot, one entry per map (set on the settings page). A map or room left out keeps the name from the Narwal app.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "title": "Map ID",
+                    "type": "integer",
+                    "description": "The map's number on the robot (1 is usually the main map)."
+                  },
+                  "name": {
+                    "title": "Name in the Home app",
+                    "type": "string",
+                    "description": "Defaults to the map's name in the Narwal app."
+                  },
+                  "stairDetection": {
+                    "title": "Stair detection",
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Turn off only on floors with no stairs going down. The plugin sets the robot to this before every clean on the floor."
+                  },
+                  "rooms": {
+                    "title": "Rooms",
+                    "type": "array",
+                    "description": "Room names to show in the Home app instead of the ones from the Narwal app.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "title": "Room ID",
+                          "type": "integer",
+                          "description": "The room's number on this map."
+                        },
+                        "name": {
+                          "title": "Name in the Home app",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
             "cleanModes": {
               "type": "object",
               "title": "Clean modes",
