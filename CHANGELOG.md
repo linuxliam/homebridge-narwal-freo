@@ -13,6 +13,10 @@
   and the tile shows an error. The rooms you last picked are remembered even if the Home app was told
   they were refused, and a selection that isn't clean is refused rather than turned into a clean of
   everything.
+- A job the plugin started is stopped if the robot places itself on another floor's map (it tries its
+  other maps when it can't find its place, and may settle on the wrong one, where no-go zones mean
+  nothing): the plugin checks the current map every 5 seconds, stops the job and shows "The Freo placed
+  itself on <floor>, not <floor>" on the tile. Jobs started in the Narwal app are only logged.
 - Stair detection per floor (on by default for every floor of a robot with several maps; a robot with
   one map is left alone unless you choose a value). A job running on a floor that needs it while the
   robot has it off is paused, with an error on the tile; Resume turns it back on.

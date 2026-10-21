@@ -123,7 +123,10 @@ the rest:
 If any step is refused or not answered, nothing starts and the Home app tile shows an error
 ("Unable to start or resume"), so you never need the log. Carry the robot to the floor first: it
 finds its place on the map from where it stands. A robot put on the wrong floor reports "Robot
-positioning failed" after a few minutes.
+positioning failed" after a few minutes. If a Freo can't find its place it may also take another
+floor's map for the one it was given; the plugin watches for that during a clean it started, stops the
+robot and says so on the tile ("The Freo placed itself on Main Map, not Upstairs"). Start it on the
+floor's starting point (the P on the Narwal app's map) to avoid this.
 
 - **Names:** the settings page lists each map and its rooms. Give a floor or a room another name for
   the Home app (say "Corridor" upstairs becomes "Hallway"); leave it empty to keep Narwal's.
