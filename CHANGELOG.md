@@ -21,6 +21,11 @@
   one map is left alone unless you choose a value). A job running on a floor that needs it while the
   robot has it off is paused, with an error on the tile; Resume turns it back on.
 - Cleaning plans are kept per map, and a plan is only used for rooms of its own map.
+- Floors without a base station: Narwal only allows zone cleaning there, so the plugin cleans each
+  room you pick as a zone shaped like the room (from the room shapes on the robot's map, without its
+  no-go zones), one start with a zone per room, using the room's settings for the chosen mode. With no
+  room picked, every room of that floor. The robot limits mopping there to about 14 m² per job
+  (it needs a base to wash the mops); the log says so. The main map still cleans rooms.
 - Return to dock on a floor without a base station goes to the map's starting point; if the robot
   refuses or doesn't set off, the clean is ended and the tile shows an error. The robot shows as
   Stopped, not Docked, when it isn't on a base. Halts for the security system are timed to the
