@@ -1,8 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.6.1
 
 - Settings page: clean-mode options say Default again (Room setting didn't fit the Home UI's selects).
+- README: updated header and device images.
+- 0.6.0 wasn't published on npm; updating from 0.4.x brings everything listed under 0.6.0 below.
 
 ## 0.6.0
 
