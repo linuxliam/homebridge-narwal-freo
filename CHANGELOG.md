@@ -21,11 +21,17 @@
   one map is left alone unless you choose a value). A job running on a floor that needs it while the
   robot has it off is paused, with an error on the tile; Resume turns it back on.
 - Cleaning plans are kept per map, and a plan is only used for rooms of its own map.
-- Floors without a base station: Narwal only allows zone cleaning there, so the plugin cleans each
-  room you pick as a zone shaped like the room (from the room shapes on the robot's map, without its
-  no-go zones), one start with a zone per room, using the room's settings for the chosen mode. With no
-  room picked, every room of that floor. The robot limits mopping there to about 14 m² per job
-  (it needs a base to wash the mops); the log says so. The main map still cleans rooms.
+- Floors without a base station: Narwal only allows zone cleaning there, and only one zone per job, so
+  the plugin cleans the rooms you pick one at a time, each as a zone shaped like the room (from the
+  room shapes on the robot's map, without its no-go zones), using the room's settings for the chosen
+  mode. When a room's clean is reported finished, the next room starts, after checking again that the
+  robot is still on that floor with the right stair detection and that the security system allows it;
+  the security hold stays on until the last room is done, and the tile shows one clean. Pause and
+  Resume work on the room being cleaned and keep the rest. Any other end (stopped, an error, a
+  different end reason, Return to dock, the security system arming Away, the robot changing floors)
+  drops the remaining rooms, and a restart of Homebridge does too. With no room picked, every room of
+  that floor. The robot limits mopping there to about 14 m² per job (it needs a base to wash the
+  mops); the log says so. The main map still cleans rooms.
 - Return to dock on a floor without a base station goes to the map's starting point; if the robot
   refuses or doesn't set off, the clean is ended and the tile shows an error. The robot shows as
   Stopped, not Docked, when it isn't on a base. Halts for the security system are timed to the

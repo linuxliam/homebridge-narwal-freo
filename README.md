@@ -138,9 +138,11 @@ floor's starting point (the P on the Narwal app's map) to avoid this.
   while the robot cleans a floor that needs it, the robot is paused (the tile shows an error;
   Resume turns it back on). A robot with a single map is left alone unless you choose a value.
 - **Floors without a base station:** Narwal only offers zone cleaning on them, so the plugin cleans
-  each room you pick as a zone shaped like the room (several rooms: one zone each). Pick no room to
-  clean the whole floor. The robot limits mopping there to about 14 m² (150 sq ft) per job, because it
-  has no base to wash the mops; it stops by itself at its limit.
+  each room you pick as a zone shaped like the room, one room at a time (the Narwal app takes one
+  zone per job): when a room is finished the next one starts, with the security hold kept in force
+  until the last. Stopping, an error, Return to dock or a restart of Homebridge ends the rest of the
+  list. Pick no room to clean the whole floor. The robot limits mopping there to about 14 m²
+  (150 sq ft) per job, because it has no base to wash the mops; it stops by itself at its limit.
 - **Return to dock** on a floor without a base station sends the robot back to its starting point
   (the "P" on the map in the Narwal app). If the robot refuses or doesn't set off within 20
   seconds, the plugin ends the clean and the tile shows "Unable to find charging dock". When the
