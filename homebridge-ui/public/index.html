@@ -48,7 +48,7 @@
   <h5 class="mb-3">Narwal account</h5>
 
   <div id="signed-in" class="d-flex flex-wrap align-items-center justify-content-between gap-2" hidden>
-    <span id="signed-in-text" role="status">Signed in to Narwal.</span>
+    <span class="d-flex align-items-center"><span class="badge rounded-pill text-bg-success me-2" aria-hidden="true">✓</span><span id="signed-in-text" role="status">Signed in to Narwal.</span></span>
     <button type="button" class="btn btn-sm btn-outline-secondary" id="sign-in-again">Sign in again</button>
   </div>
 
@@ -85,7 +85,7 @@
   <div class="mb-3">
     <div class="form-check form-switch">
       <input class="form-check-input" type="checkbox" role="switch" id="vacation-mode">
-      <label class="form-check-label" for="vacation-mode">Enable Vacation Mode</label>
+      <label class="form-check-label" for="vacation-mode">Cut back cleaning on vacation</label>
       <p class="hint mt-1 mb-0">Cuts back scheduled cleaning while Vacation Mode is on in the Home app. If no existing
         vacation switch is found, one will be added automatically. <a href="https://github.com/seanfletchr/homebridge-narwal-freo#vacation-mode-optional" target="_blank" rel="noopener">Learn more…</a></p>
     </div>
@@ -103,7 +103,6 @@
         <option value="none">No cleaning</option>
         <option value="vacuum">Vacuum only (no mopping)</option>
       </select>
-      <div class="hint mt-1 mb-0">Vacuum only: mopping cleans vacuum instead.</div>
     </div>
   </div>
 </div>
@@ -113,7 +112,7 @@
   <div class="mb-3">
     <div class="form-check form-switch">
       <input class="form-check-input" type="checkbox" role="switch" id="security-hold">
-      <label class="form-check-label" for="security-hold">Keep security from arming Away while cleaning</label>
+      <label class="form-check-label" for="security-hold">Hold security while cleaning</label>
       <p class="hint mt-1 mb-0">Keeps the robot from setting off the alarm: Away switches to Home while it cleans and back
         to Away when it's done. Works with supported security plugins. <a href="https://github.com/seanfletchr/homebridge-narwal-freo/blob/main/docs/security-hold.md" target="_blank" rel="noopener">Learn more…</a></p>
     </div>
@@ -130,7 +129,7 @@
       <div class="hint mt-1 mb-0">A socket path or URL for the security hold API.</div>
     </div>
     <div class="mb-3">
-      <label for="security-stopped-minutes" class="form-label">Back to Away when a robot stops moving for</label>
+      <label for="security-stopped-minutes" class="form-label">Release the hold if the robot stops moving for</label>
       <div class="input-group num">
         <input type="number" class="form-control" id="security-stopped-minutes" min="0" max="240" step="1" placeholder="10">
         <span class="input-group-text">min</span>
@@ -154,9 +153,9 @@
   ];
   const CHOICES = {
     task: [['vacuum_and_mop', 'Vacuum and Mop'], ['vacuum_then_mop', 'Vacuum then Mop'], ['freo_mind', 'Freo Mind']],
-    passes: [['app', 'Default'], ['1', '1'], ['2', '2'], ['3', '3']],
-    suction: [['app', 'Default'], ['quiet', 'Quiet'], ['standard', 'Standard'], ['strong', 'Strong']],
-    water: [['app', 'Default'], ['dry', 'Slightly dry'], ['standard', 'Standard'], ['wet', 'Slightly wet']],
+    passes: [['app', 'Room setting'], ['1', '1'], ['2', '2'], ['3', '3']],
+    suction: [['app', 'Room setting'], ['quiet', 'Quiet'], ['standard', 'Standard'], ['strong', 'Strong']],
+    water: [['app', 'Room setting'], ['dry', 'Slightly dry'], ['standard', 'Standard'], ['wet', 'Slightly wet']],
   };
   const el = (tag, props = {}, ...children) => {
     const node = Object.assign(document.createElement(tag), props);
@@ -393,7 +392,7 @@
           if (name) { m.name = name; } else { delete m.name; }
         }), name => { title.textContent = name || map.name; })));
     if (several) {
-      body.append(switchRow('Stair detection', saved.stairDetection !== false, on => {
+      body.append(switchRow('Detect stairs', saved.stairDetection !== false, on => {
         stairBadge.hidden = on;
         return setMap(serial, map.id, m => { if (on) { delete m.stairDetection; } else { m.stairDetection = false; } });
       }, 'Only turn this off on floors with no stairs going down.'));
@@ -413,8 +412,8 @@
     const several = maps.length > 1;
     const box = el('div', { className: 'section' },
       el('h6', { textContent: several ? 'Floors' : 'Rooms' }),
-      el('p', { className: 'hint mt-1 mb-2', textContent: 'Change the names the Home app shows. Changed your maps in the Narwal '
-        + 'app? They show up here within 6 hours, or when you restart the bridge.' }));
+      el('p', { className: 'hint mt-1 mb-2', textContent: (several ? 'Names and stair detection per floor. ' : 'Names per room. ')
+        + 'Map changes you make in the Narwal app show up here automatically.' }));
     for (const map of maps) {
       const floor = floorBlock(robot.serial, entry, map, several);
       box.append(several
@@ -497,10 +496,8 @@
     const heading = el('h5', { className: 'mb-0' }, title);
     const intro = [];
 
-    if (robot.firmware) {
-      intro.push(el('p', { className: 'hint mt-1 mb-0', textContent:
-        `${robot.name}, serial ${serial}, firmware ${robot.firmware}` }));
-    }
+    intro.push(el('p', { className: 'hint mt-1 mb-0', textContent:
+      robot.firmware ? `Serial ${serial} · firmware ${robot.firmware}` : `Serial ${serial}` }));
     if (robot.supported === false) {
       intro.push(el('div', { className: 'alert alert-warning mt-2 mb-0', textContent: 'This plugin only supports the '
         + 'original Narwal Freo (YJCC012). This robot may not work.' }));
@@ -526,7 +523,7 @@
 
     const modes = el('div', { className: 'section' },
       el('h6', { textContent: 'Clean modes' }),
-      el('p', { className: 'hint mt-1 mb-2', textContent: 'Choose what each clean mode in the Home app does. Default uses '
+      el('p', { className: 'hint mt-1 mb-2', textContent: 'Choose what each clean mode in the Home app does. Room setting uses '
         + 'each room\'s settings from the Narwal app.' }));
     for (const g of GROUPS) {
       modes.append(modeGroup(serial, entry, g));
@@ -538,10 +535,10 @@
     const replaceBox = el('div', { className: 'sub mb-3', hidden: !entry.consumables },
       el('label', { className: 'form-label', textContent: 'Warn to replace at (% left)' }), numberGroup(replace, '%'));
     settings.append(el('div', { className: 'section' },
-      switchRow('Cleaning sensor', Boolean(entry.cleaningSensor), on => setRobot(serial, e => { e.cleaningSensor = on; }),
+      switchRow('Show a cleaning sensor', Boolean(entry.cleaningSensor), on => setRobot(serial, e => { e.cleaningSensor = on; }),
         'Shows when the robot is cleaning, so Home app automations can react to it. Pair this plugin\'s bridge '
         + 'in the Home app too.'),
-      switchRow('Consumables', Boolean(entry.consumables), on => {
+      switchRow('Show consumables', Boolean(entry.consumables), on => {
         replaceBox.hidden = !on;
         return setRobot(serial, e => { e.consumables = on; });
       }, 'Life left on the filter, brushes, mops and sponge. The Home app doesn\'t show these; use an app such as '

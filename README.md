@@ -87,12 +87,12 @@ picks its Automatic. What each of these nine does is set in the plugin settings 
 
 | Home app | Automatic | Quick | Deep Clean |
 |---|---|---|---|
-| Vacuum | Default | 1 pass | 2 passes |
-| Mop | Default | 1 pass | 2 passes |
-| Combined | Vacuum and Mop (one pass doing both), Default | Vacuum and Mop, 1 pass | Vacuum then Mop (a vacuum pass, then a mop pass), 2 passes each |
+| Vacuum | Room setting | 1 pass | 2 passes |
+| Mop | Room setting | 1 pass | 2 passes |
+| Combined | Vacuum and Mop (one pass doing both), Room setting | Vacuum and Mop, 1 pass | Vacuum then Mop (a vacuum pass, then a mop pass), 2 passes each |
 
 For each one you can set the passes (1–3), suction (quiet / standard / strong) and water level
-(slightly dry / standard / slightly wet), or leave them at **Default**: the per-room
+(slightly dry / standard / slightly wet), or leave them at **Room setting**: the per-room
 settings saved in the Narwal app for that task. The combined ones also choose the task: Vacuum and
 Mop, Vacuum then Mop, or Freo Mind (the robot decides everything). If the robot
 hasn't sent its settings for a task yet, standard suction and water are used and the log says so.
@@ -189,7 +189,7 @@ setup code); the vacuum keeps its own Matter pairing.
 
 ## Vacation mode (optional)
 
-Going away? Turn on **Vacation mode** in the settings, and a **Vacation Mode** switch in the Home app
+Going away? Turn on **Cut back cleaning on vacation** in the settings, and a **Vacation Mode** switch in the Home app
 cuts back cleaning while you're gone. The next clean still runs, so you come home to a clean house.
 After that, cleans started from the Home app, including your scheduled automations, are skipped (or
 run vacuum only) until you turn the switch off. Your schedules stay as they are.
@@ -219,7 +219,7 @@ Good to know:
 ## Security system (optional)
 
 Motion sensors can mistake a robot vacuum for an intruder: ecobee's do, and set off the alarm. With
-**Keep security from arming Away while cleaning** (`securityHold`) on, the robot asks the security
+**Hold security while cleaning** (`securityHold`) on, the robot asks the security
 system to switch from Away to **Home** before it starts, so it can clean safely. Doors and windows
 stay armed. When the robot is done, the system goes back to Away. If Away is armed while the robot is
 cleaning, it heads back to its base, or pauses where it is if it can't make it in time.

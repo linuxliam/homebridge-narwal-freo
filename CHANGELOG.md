@@ -2,6 +2,7 @@
 
 ## 0.6.0 (unreleased)
 
+- Settings page: redesigned, with clearer labels.
 - Floors without a base station: the plugin turns off the Narwal app's "Automatically switch to the main
   map after cleaning" setting while it cleans or sends the robot to the starting point there, and turns it
   back on afterwards (also after a restart, or when the robot is seen on its base). A setting you had off
