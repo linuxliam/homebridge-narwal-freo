@@ -139,14 +139,20 @@ floor's starting point (the P on the Narwal app's map) to avoid this.
   Resume turns it back on). A robot with a single map is left alone unless you choose a value.
 - **Floors without a base station:** Narwal only offers zone cleaning on them, so the plugin cleans
   each room you pick as a zone shaped like the room, one room at a time (the Narwal app takes one
-  zone per job): when a room is finished the next one starts, with the security hold kept in force
-  until the last. Stopping, an error, Return to dock or a restart of Homebridge ends the rest of the
+  zone per job): the room the robot is in (or nearest to) goes first and then the nearest remaining
+  one, whatever order the Home app sent, and when a room is finished the next one starts, with the
+  security hold kept in force until the last. Stopping, an error, Return to dock or a restart of Homebridge ends the rest of the
   list. Pick no room to clean the whole floor. The robot limits mopping there to about 14 m²
   (150 sq ft) per job, because it has no base to wash the mops; it stops by itself at its limit.
-- **Return to dock** on a floor without a base station sends the robot back to its starting point
-  (the "P" on the map in the Narwal app). If the robot refuses or doesn't set off within 20
-  seconds, the plugin ends the clean and the tile shows "Unable to find charging dock". When the
-  security hold sends the robot home because Away is being armed, it is timed to that starting point.
+- **Return to dock** on a floor without a base station stops the clean at once and sends the robot
+  back to that floor's starting point (the "P" on the map in the Narwal app). The robot refuses to be
+  recalled there and has no "go to" command, so the plugin sends it on a tiny zone clean of about
+  30 x 30 cm around the point (one pass, quietest suction): it does a few seconds of vacuuming there
+  because that is the only way to move it. The trip is checked like a start (right floor, stair
+  detection, security hold); if anything fails, or the robot refuses, it stays where it stopped and
+  the tile shows "Unable to find charging dock". When the security system sends the robot home
+  because Away is being armed, it makes the same trip against the clock, and if it can't make it, the
+  clean is simply ended.
 - **Existing scenes and automations keep working:** the main map's rooms keep the ids they had,
   other maps' rooms use `map id * 1000 + room id`.
 - **Cleaning plans** (your per-room settings from the Narwal app) are kept per map, and each clean

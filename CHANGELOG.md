@@ -32,10 +32,16 @@
   drops the remaining rooms, and a restart of Homebridge does too. With no room picked, every room of
   that floor. The robot limits mopping there to about 14 m² per job (it needs a base to wash the
   mops); the log says so. The main map still cleans rooms.
-- Return to dock on a floor without a base station goes to the map's starting point; if the robot
-  refuses or doesn't set off, the clean is ended and the tile shows an error. The robot shows as
-  Stopped, not Docked, when it isn't on a base. Halts for the security system are timed to the
-  starting point on such floors.
+- Return to dock on a floor without a base station stops the clean at once and sends the robot back
+  to the map's starting point (the "P" in the Narwal app), since the robot refuses to be recalled
+  there: a tiny zone clean (about 30 x 30 cm, quietest suction, one pass) takes it there, after the
+  checks of a start. If a check fails or the robot refuses, it stays where it stopped and the tile
+  shows an error. The trip isn't counted as a clean for vacation mode. Halts for the security system
+  make the same trip against the clock, or just end the clean if it can't make it. The robot shows as
+  Stopped, not Docked, when it isn't on a base.
+- Rooms on a floor without a base are cleaned nearest first: the room the robot is in (or nearest
+  to; the starting point if its position isn't known), then the nearest of the rest, whatever order
+  the Home app sent. The order is logged.
 - Settings: floor and room names for the Home app, and stair detection per floor (`maps` in a
   robot's settings), listed on the settings page from the maps the robot reports.
 - The robot's state file now keeps every map (`maps`, `plansByMap`); an older one is converted on
