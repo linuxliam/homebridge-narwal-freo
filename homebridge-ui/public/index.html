@@ -1,6 +1,8 @@
 <style>
   /* Inherit the theme's text colour; Bootstrap's muted grey is unreadable on Homebridge's dark themes. */
-  .hint { opacity: 0.75; font-size: 0.875em; }
+  .hint { color: rgba(var(--bs-body-color-rgb), 0.75); font-size: 0.875em; }
+  .hint a { color: var(--bs-link-color); font-weight: 600; }
+  .hint a:hover { color: var(--bs-link-hover-color); }
 
   /* Collapsible rows: pointer, even padding and a small chevron instead of the default triangle. */
   details > summary { cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; padding: 0.25rem 0; list-style: none; }
