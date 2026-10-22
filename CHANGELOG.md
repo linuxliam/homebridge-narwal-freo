@@ -1,74 +1,41 @@
 # Changelog
 
-## 0.6.0 (unreleased)
+## 0.6.0
 
-- Settings page: redesigned, with clearer labels.
-- Floors without a base station: the plugin turns off the Narwal app's "Automatically switch to the main
-  map after cleaning" setting while it cleans or sends the robot to the starting point there, and turns it
-  back on afterwards (also after a restart, or when the robot is seen on its base). A setting you had off
-  is left alone. If it can't be changed, the plugin switches the map back itself.
-- Errors the plugin itself puts on the tile (a refused start, a stopped room queue, a wrong floor) clear after
-  a minute, and at once when you start, resume or send the robot home, because the Home app hides the
-  vacuum's controls while it shows an error. The robot's own errors still clear only when the robot does.
-- Floors without a base station: if the robot switches to the main map when a job ends (the Narwal app's
-  "switch to the main map after cleaning" setting), the plugin switches it back before the next room or
-  the trip to the starting point. Zone jobs no longer show a wrong room on the tile, and the start log
-  lists the rooms in the order they are cleaned.
-- Rooms the Narwal app shows by type now get the app's names (Bathroom, Hallway, Toilet, Closet, …) in
-  title case (Living Room, Master Bedroom); some were wrong before, e.g. a bathroom was called Study.
-  Room numbers are unchanged, so scenes and automations keep working, but Siri and the Home app use the new names.
-- Multiple floors: every map saved on the robot is published, with its rooms. The Home app shows a
-  Cleaning Map picker; rooms of the main map keep their ids, so existing scenes and automations keep
-  working, and other maps' rooms use `map id * 1000 + room id`. Starting a clean on another floor
-  switches the robot's map first and checks it, sets that floor's stair detection and checks that too,
-  then does the security check and starts. A step the robot refuses or doesn't answer means no start,
-  and the tile shows an error. The rooms you last picked are remembered even if the Home app was told
-  they were refused, and a selection that isn't clean is refused rather than turned into a clean of
-  everything.
-- A job the plugin started is stopped if the robot places itself on another floor's map (it tries its
-  other maps when it can't find its place, and may settle on the wrong one, where no-go zones mean
-  nothing): the plugin checks the current map every 5 seconds, stops the job and shows "The Freo placed
-  itself on <floor>, not <floor>" on the tile. Jobs started in the Narwal app are only logged.
-- Stair detection per floor (on by default for every floor of a robot with several maps; a robot with
-  one map is left alone unless you choose a value). A job running on a floor that needs it while the
-  robot has it off is paused, with an error on the tile; Resume turns it back on.
-- Cleaning plans are kept per map, and a plan is only used for rooms of its own map.
-- Floors without a base station: Narwal only allows zone cleaning there, and only one zone per job, so
-  the plugin cleans the rooms you pick one at a time, each as a zone shaped like the room (from the
-  room shapes on the robot's map, without its no-go zones), using the room's settings for the chosen
-  mode. When a room's clean is reported finished, the next room starts, after checking again that the
-  robot is still on that floor with the right stair detection and that the security system allows it;
-  the security hold stays on until the last room is done, and the tile shows one clean. Pause and
-  Resume work on the room being cleaned and keep the rest. Any other end (stopped, an error, a
-  different end reason, Return to dock, the security system arming Away, the robot changing floors)
-  drops the remaining rooms, and a restart of Homebridge does too. With no room picked, every room of
-  that floor. The robot limits mopping there to about 14 m² per job (it needs a base to wash the
-  mops); the log says so. The main map still cleans rooms.
-- Return to dock on a floor without a base station stops the clean at once and sends the robot back
-  to the map's starting point (the "P" in the Narwal app), since the robot refuses to be recalled
-  there: a tiny zone clean (about 30 x 30 cm, quietest suction, one pass) takes it there, after the
-  checks of a start. If a check fails or the robot refuses, it stays where it stopped and the tile
-  shows an error. The trip isn't counted as a clean for vacation mode. Halts for the security system
-  make the same trip against the clock, or just end the clean if it can't make it. The robot shows as
-  Stopped, not Docked, when it isn't on a base.
-- Rooms on a floor without a base are cleaned nearest first: the room the robot is in (or nearest
-  to; the starting point if its position isn't known), then the nearest of the rest, whatever order
-  the Home app sent. The order is logged.
-- Settings: floor and room names for the Home app, and stair detection per floor (`maps` in a
-  robot's settings), listed on the settings page from the maps the robot reports.
-- The robot's state file now keeps every map (`maps`, `plansByMap`); an older one is converted on
-  start.
-
-## Unreleased
-
-- Rooms and cleaning plans now load by themselves. The robot only answers requests that look exactly like
+- **Rooms and cleaning plans load by themselves.** The robot only answers requests that look exactly like
   the Narwal app's, so before, they arrived only while the Narwal app was open; the plugin now asks the
-  way the app does, at start and then every 6 hours. You no longer need to open the Narwal app on the map.
-- Robots with more than one map (for example an upstairs map without a base station): the vacuum
-  keeps the rooms of the map with the base station. Opening another map in the Narwal app no longer
-  swaps the room list, and cleaning plans from another map are ignored.
-- The log warns when the robot refuses a command (start, pause, resume, return to dock, stop, locate,
-  consumable reset) or doesn't answer within 5 seconds.
+  way the app does. You no longer need to open the Narwal app on the map, and map changes you make in the
+  Narwal app show up in the Home app and the settings automatically.
+- The robot now confirms each command, and the log warns when it refuses one (start, pause, resume,
+  return to dock, stop, locate, consumable reset) or doesn't answer within 5 seconds.
+- Rooms the Narwal app shows by type get the app's names in title case (Bathroom, Hallway, Living Room,
+  Master Bedroom, …); some were wrong before, e.g. a bathroom was called Study. Room numbers are
+  unchanged, so scenes and automations keep working, but Siri and the Home app use the new names.
+- Settings page: redesigned, with clearer labels, and names for floors and rooms in the Home app.
+- Errors the plugin itself puts on the tile (a refused start, for example) clear after a minute, and at
+  once when you start, resume or send the robot home, because the Home app hides the vacuum's controls
+  while it shows an error. The robot's own errors still clear only when the robot does.
+
+### Multiple floors (in development)
+
+Robots with more than one saved map (for example an upstairs map without a base station) now get every
+floor in the Home app. **This is still in development:** it works in testing, but expect rough edges, and
+see the README for what's known not to work yet. Robots with one map are not affected.
+
+- The Home app shows a Cleaning Map picker; rooms of the main map keep their ids, so existing scenes and
+  automations keep working (other maps' rooms use `map id * 1000 + room id`). Starting a clean on another
+  floor switches the robot's map and sets that floor's stair detection first, checking each step;
+  anything refused means no start, with an error on the tile.
+- Stair detection per floor (on by default for every floor; set it in the settings).
+- Floors without a base station: Narwal only allows one zone per job there, so the plugin cleans the
+  rooms you pick one at a time, nearest first, each as a zone shaped like the room. The robot limits
+  mopping there to about 14 m² per job. Return to dock stops the clean and sends the robot back to the
+  floor's starting point (the "P" in the Narwal app). While it works there, the plugin turns off the
+  Narwal app's "Automatically switch to the main map after cleaning" and turns it back on afterwards.
+- A job the plugin started is stopped, with an error on the tile, if the robot places itself on another
+  floor's map.
+- Cleaning plans are kept per map. The robot's state file now keeps every map; an older one is converted
+  on start.
 
 ## 0.4.2
 

@@ -110,7 +110,17 @@ mode number is never dropped without mapping it to one that stays (see `RETIRED_
 `lib/vacuum.js`). Labels must be unique too: two slots set up the same get their slot name, e.g.
 "Mop, 1 pass (Quick)".
 
-## Multiple floors
+## Multiple floors (in development)
+
+> **Still in development.** Multi-floor support works in testing but isn't finished. Known gaps:
+> - The plugin can't tell when you carry the robot to another floor (the robot doesn't report being
+>   picked up). After carrying it, start cleans on the floor it's on now; Return to dock may assume
+>   the floor it was last cleaning, so put it on its base yourself.
+> - A clean started with no rooms picked (for example from an automation) uses the floor of the
+>   rooms picked last time.
+> - Mopping on a floor without a base station is barely tested.
+>
+> Robots with a single map are not affected. Feedback is welcome in the GitHub issues.
 
 A Freo can keep several maps, one per floor. The plugin publishes all of them: the Home app shows a
 **Cleaning Map** picker, and each floor's rooms. Pick rooms on one floor and start; the plugin does
