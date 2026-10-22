@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Settings page: clean-mode options say Default again (Room setting didn't fit the Home UI's selects).
+
 ## 0.6.0
 
 - **Rooms and cleaning plans load by themselves.** The robot only answers requests that look exactly like

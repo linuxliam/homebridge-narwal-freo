@@ -87,12 +87,12 @@ picks its Automatic. What each of these nine does is set in the plugin settings 
 
 | Home app | Automatic | Quick | Deep Clean |
 |---|---|---|---|
-| Vacuum | Room setting | 1 pass | 2 passes |
-| Mop | Room setting | 1 pass | 2 passes |
-| Combined | Vacuum and Mop (one pass doing both), Room setting | Vacuum and Mop, 1 pass | Vacuum then Mop (a vacuum pass, then a mop pass), 2 passes each |
+| Vacuum | Default | 1 pass | 2 passes |
+| Mop | Default | 1 pass | 2 passes |
+| Combined | Vacuum and Mop (one pass doing both), Default | Vacuum and Mop, 1 pass | Vacuum then Mop (a vacuum pass, then a mop pass), 2 passes each |
 
 For each one you can set the passes (1–3), suction (quiet / standard / strong) and water level
-(slightly dry / standard / slightly wet), or leave them at **Room setting**: the per-room
+(slightly dry / standard / slightly wet), or leave them at **Default**: the per-room
 settings saved in the Narwal app for that task. The combined ones also choose the task: Vacuum and
 Mop, Vacuum then Mop, or Freo Mind (the robot decides everything). If the robot
 hasn't sent its settings for a task yet, standard suction and water are used and the log says so.
