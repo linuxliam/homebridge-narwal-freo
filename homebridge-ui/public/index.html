@@ -1,40 +1,72 @@
 <style>
   /* Inherit the theme's text colour; Bootstrap's muted grey is unreadable on Homebridge's dark themes. */
   .hint { opacity: 0.75; font-size: 0.875em; }
-  details > summary { cursor: pointer; }
-  .robot > summary { font-size: 1.25rem; font-weight: 500; }
-  .group { border-top: 1px solid rgba(128, 128, 128, 0.3); padding-top: 0.5rem; margin-top: 0.5rem; }
-  .group > summary { font-weight: 500; }
+
+  /* Collapsible rows: pointer, even padding and a small chevron instead of the default triangle. */
+  details > summary { cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; padding: 0.25rem 0; list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  details > summary::before { content: ''; flex: none; width: 0.45em; height: 0.45em; margin: 0 0.35em 0 0.1em;
+    box-sizing: content-box; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; opacity: 0.7;
+    transform: rotate(-45deg); }
+  details[open] > summary::before, details.box[open] > summary::before { transform: rotate(45deg); }
+  details > summary:focus-visible { outline: 2px solid rgba(128, 128, 128, 0.7); outline-offset: 2px; }
+
+  /* Sub-sections of a card. */
+  .section { border-top: 1px solid rgba(128, 128, 128, 0.3); padding-top: 1rem; margin-top: 1rem; }
+  .section > h6 { font-weight: 600; margin-bottom: 0.25rem; }
+
+  /* Options that belong to the switch above them, lined up with its label. */
+  .sub { margin-left: 2.5rem; padding-left: 0.75rem; border-left: 2px solid rgba(128, 128, 128, 0.3); }
+
+  /* No trailing gap at the end of a container. */
+  .card-body > :last-child, .section > :last-child, .sub > :last-child, .settings > :last-child,
+  .box-body > :last-child, details > :last-child { margin-bottom: 0 !important; }
+
+  /* Collapsible boxes: floors and clean-mode groups. */
+  .box { border: 1px solid rgba(128, 128, 128, 0.3); border-radius: 0.375rem; padding: 0.25rem 0.75rem; margin-top: 0.5rem; }
+  .box > summary { font-weight: 500; }
+  .box-body { padding: 0.5rem 0 0.75rem; }
+  .sum { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; }
+  .badge-o[hidden] { display: none; }
+  .badge-o { color: inherit; background: transparent; border-color: rgba(128, 128, 128, 0.6) !important; font-weight: 400; }
+
+  /* Field sizes. */
+  .name-input { max-width: 20rem; }
+  .wide-input { max-width: 32rem; }
+  .num { width: 9rem; }
+
+  /* Tables. */
+  .modes { table-layout: fixed; max-width: none; margin-bottom: 0.25rem; }
   .modes td, .modes th { vertical-align: middle; }
-  .modes select { min-width: 7em; }
-  .modes select.task { min-width: 11.5em; }
-  .floor { border-top: 1px solid rgba(128, 128, 128, 0.3); padding-top: 0.75rem; margin-top: 0.75rem; }
-  .floor .room-name { max-width: 16rem; }
+  .modes select { min-width: 0; }
+  .rooms { table-layout: fixed; min-width: 22rem; margin-bottom: 0; }
+  .rooms td, .rooms th { vertical-align: middle; }
+  .rooms col.first { width: 12rem; }
 </style>
 
 <div class="card card-body mb-3">
   <h5 class="mb-3">Narwal account</h5>
 
-  <div id="signed-in" hidden>
-    <div class="alert alert-success mb-2" role="status" id="signed-in-text">Signed in to Narwal.</div>
-    <button type="button" class="btn btn-secondary" id="sign-in-again">Sign in again</button>
+  <div id="signed-in" class="d-flex flex-wrap align-items-center justify-content-between gap-2" hidden>
+    <span id="signed-in-text" role="status">Signed in to Narwal.</span>
+    <button type="button" class="btn btn-sm btn-outline-secondary" id="sign-in-again">Sign in again</button>
   </div>
 
   <div id="signin" hidden>
     <p class="hint mb-3" id="signin-hint">Sign in with the account you use in the Narwal app.</p>
     <form id="signin-form" autocomplete="on">
-      <div class="mb-2">
+      <div class="mb-3">
         <label for="email" class="form-label">Narwal email</label>
-        <input type="email" class="form-control" id="email" autocomplete="username" required>
+        <input type="email" class="form-control name-input" id="email" autocomplete="username" required>
       </div>
-      <div class="mb-2">
+      <div class="mb-3">
         <label for="password" class="form-label">Password</label>
-        <input type="password" class="form-control" id="password" autocomplete="current-password" required>
-        <div class="hint mt-1">Saved so the plugin can stay signed in.</div>
+        <input type="password" class="form-control name-input" id="password" autocomplete="current-password" required>
+        <div class="hint mt-1 mb-0">Saved so the plugin can stay signed in.</div>
       </div>
       <div class="mb-3">
         <label for="region" class="form-label">Narwal cloud region</label>
-        <select class="form-select" id="region">
+        <select class="form-select name-input" id="region">
           <option value="us">United States / Canada</option>
         </select>
       </div>
@@ -49,53 +81,61 @@
 <div id="robots"></div>
 
 <div class="card card-body mb-3" id="vacation-card" hidden>
-  <h5 class="mb-2">Vacation mode</h5>
-  <div class="form-check form-switch mb-1">
-    <input class="form-check-input" type="checkbox" role="switch" id="vacation-mode">
-    <label class="form-check-label" for="vacation-mode">Enable Vacation Mode</label>
-  </div>
-  <p class="hint mb-2">Cuts back scheduled cleaning while Vacation Mode is on in the Home app. If no existing
-    vacation switch is found, one will be added automatically. <a href="https://github.com/seanfletchr/homebridge-narwal-freo#vacation-mode-optional" target="_blank" rel="noopener">Learn more…</a></p>
-  <div id="vacation-box" hidden>
-    <div>
-      <label for="vacation-cleans" class="form-label">Cleans allowed after it's turned on</label>
-      <input type="number" class="form-control" id="vacation-cleans" min="0" max="5" step="1" placeholder="1" style="max-width: 6rem">
+  <h5 class="mb-3">Vacation mode</h5>
+  <div class="mb-3">
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" role="switch" id="vacation-mode">
+      <label class="form-check-label" for="vacation-mode">Enable Vacation Mode</label>
+      <p class="hint mt-1 mb-0">Cuts back scheduled cleaning while Vacation Mode is on in the Home app. If no existing
+        vacation switch is found, one will be added automatically. <a href="https://github.com/seanfletchr/homebridge-narwal-freo#vacation-mode-optional" target="_blank" rel="noopener">Learn more…</a></p>
     </div>
-    <div class="mt-3">
+  </div>
+  <div class="sub" id="vacation-box" hidden>
+    <div class="mb-3">
+      <label for="vacation-cleans" class="form-label">Cleans allowed after it's turned on</label>
+      <div class="input-group num">
+        <input type="number" class="form-control" id="vacation-cleans" min="0" max="5" step="1" placeholder="1">
+      </div>
+    </div>
+    <div class="mb-3">
       <label for="vacation-after" class="form-label">After that</label>
-      <select class="form-select" id="vacation-after" style="max-width: 20rem">
+      <select class="form-select name-input" id="vacation-after">
         <option value="none">No cleaning</option>
         <option value="vacuum">Vacuum only (no mopping)</option>
       </select>
-      <div class="hint mt-1">Vacuum only: mopping cleans vacuum instead.</div>
+      <div class="hint mt-1 mb-0">Vacuum only: mopping cleans vacuum instead.</div>
     </div>
   </div>
 </div>
 
 <div class="card card-body mb-3" id="security-card" hidden>
-  <h5 class="mb-2">Security hold</h5>
-  <div class="form-check form-switch mb-1">
-    <input class="form-check-input" type="checkbox" role="switch" id="security-hold">
-    <label class="form-check-label" for="security-hold">Keep security from arming Away while cleaning</label>
-  </div>
-  <p class="hint mb-2">Keeps the robot from setting off the alarm: Away switches to Home while it cleans and back
-    to Away when it's done. Works with supported security plugins. <a href="https://github.com/seanfletchr/homebridge-narwal-freo/blob/main/docs/security-hold.md" target="_blank" rel="noopener">Learn more…</a></p>
-  <div id="security-provider-box" hidden>
-    <label for="security-provider" class="form-label">Security system</label>
-    <select class="form-select" id="security-provider"></select>
-    <div class="hint mt-1" id="security-provider-hint"></div>
-    <div class="mt-2" id="security-endpoint-box" hidden>
-      <label for="security-endpoint" class="form-label">Endpoint</label>
-      <input type="text" class="form-control" id="security-endpoint" placeholder="/path/to/control.sock or https://…">
-      <div class="hint mt-1">A socket path or URL for the security hold API.</div>
+  <h5 class="mb-3">Security hold</h5>
+  <div class="mb-3">
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" role="switch" id="security-hold">
+      <label class="form-check-label" for="security-hold">Keep security from arming Away while cleaning</label>
+      <p class="hint mt-1 mb-0">Keeps the robot from setting off the alarm: Away switches to Home while it cleans and back
+        to Away when it's done. Works with supported security plugins. <a href="https://github.com/seanfletchr/homebridge-narwal-freo/blob/main/docs/security-hold.md" target="_blank" rel="noopener">Learn more…</a></p>
     </div>
-    <div class="mt-3">
+  </div>
+  <div class="sub" id="security-provider-box" hidden>
+    <div class="mb-3">
+      <label for="security-provider" class="form-label">Security system</label>
+      <select class="form-select wide-input" id="security-provider"></select>
+      <div class="hint mt-1 mb-0" id="security-provider-hint"></div>
+    </div>
+    <div class="mb-3" id="security-endpoint-box" hidden>
+      <label for="security-endpoint" class="form-label">Endpoint</label>
+      <input type="text" class="form-control wide-input" id="security-endpoint" placeholder="/path/to/control.sock or https://…">
+      <div class="hint mt-1 mb-0">A socket path or URL for the security hold API.</div>
+    </div>
+    <div class="mb-3">
       <label for="security-stopped-minutes" class="form-label">Back to Away when a robot stops moving for</label>
-      <div class="input-group" style="max-width: 12rem">
+      <div class="input-group num">
         <input type="number" class="form-control" id="security-stopped-minutes" min="0" max="240" step="1" placeholder="10">
         <span class="input-group-text">min</span>
       </div>
-      <div class="hint mt-1">If the robot gets stuck or is paused mid-clean. 0: wait until cleaning ends.</div>
+      <div class="hint mt-1 mb-0">If the robot gets stuck or is paused mid-clean. 0: wait until cleaning ends.</div>
     </div>
   </div>
 </div>
@@ -264,9 +304,12 @@
     const input = el('input', { className: 'form-check-input', type: 'checkbox', id, checked });
     input.setAttribute('role', 'switch');
     input.addEventListener('change', () => onChange(input.checked));
-    const box = el('div', { className: 'form-check form-switch mb-1' }, input,
+    const box = el('div', { className: 'form-check form-switch' }, input,
       el('label', { className: 'form-check-label', htmlFor: id, textContent: label }));
-    return hint ? el('div', { className: 'mb-3' }, box, el('div', { className: 'hint', textContent: hint })) : box;
+    if (hint) {
+      box.append(el('div', { className: 'hint mt-1 mb-0', textContent: hint }));
+    }
+    return el('div', { className: 'mb-3' }, box);
   }
 
   function select(field, value, onChange) {
@@ -276,6 +319,11 @@
     }
     s.addEventListener('change', () => onChange(s.value));
     return s;
+  }
+
+  /** A number field with a unit (or none) beside it. */
+  function numberGroup(input, unit) {
+    return el('div', { className: 'input-group num' }, input, ...(unit ? [el('span', { className: 'input-group-text', textContent: unit })] : []));
   }
 
   /** Change one map's entry in a robot's `maps` setting; entries left with nothing to say are dropped. */
@@ -298,62 +346,81 @@
     });
   }
 
-  /** Text field that saves its value (empty: back to the default) when it changes. */
-  function nameField(value, placeholder, save, className = '') {
-    const input = el('input', { className: `form-control form-control-sm ${className}`, type: 'text', value: value ?? '', placeholder });
+  /** Text field that saves its value (empty: back to the default) when it changes; `live` sees every keystroke. */
+  function nameField(value, placeholder, save, live) {
+    const input = el('input', { className: 'form-control name-input', type: 'text', value: value ?? '', placeholder });
     input.addEventListener('change', () => save(input.value.trim()));
+    if (live) {
+      input.addEventListener('input', () => live(input.value.trim()));
+    }
     return input;
   }
 
-  /** One saved map: its name, stair detection and rooms. */
+  const pill = text => el('span', { className: 'badge rounded-pill border badge-o', textContent: text });
+
+  /** One saved map: its name, stair detection and rooms. Returns the floor's body and its summary parts. */
   function floorBlock(serial, entry, map, several) {
     const saved = entry.maps?.find(m => Number(m.id) === map.id) ?? {};
-    const rooms = el('div', { className: 'mt-2' });
+    const title = el('span', { textContent: saved.name || map.name });
+    const stairBadge = pill('Stair detection off');
+    stairBadge.hidden = !(several && saved.stairDetection === false);
+    const badges = [];
+    if (!map.hasDock) {
+      badges.push(pill('No base station'));
+    }
+    badges.push(stairBadge);
+
+    const roomRows = el('tbody');
     for (const room of map.rooms) {
       const chosen = saved.rooms?.find(r => Number(r.id) === room.id)?.name;
-      rooms.append(el('div', { className: 'd-flex align-items-center gap-2 mb-1' },
-        el('span', { className: 'hint', style: 'min-width: 9rem', textContent: room.name }),
-        nameField(chosen, 'Name in the Home app', name => setMap(serial, map.id, m => {
+      roomRows.append(el('tr', {},
+        el('td', { textContent: room.name }),
+        el('td', {}, nameField(chosen, room.name, name => setMap(serial, map.id, m => {
           m.rooms = (m.rooms ?? []).filter(r => Number(r.id) !== room.id);
           if (name) {
             m.rooms.push({ id: room.id, name });
           }
-        }), 'room-name')));
+        })))));
     }
-    const block = el('div', { className: 'floor' },
-      el('div', { className: 'mb-2' }, el('label', { className: 'form-label mb-1', textContent: 'Name in the Home app' }),
+    const table = el('table', { className: 'table table-sm rooms' },
+      el('colgroup', {}, el('col', { className: 'first' }), el('col')),
+      el('thead', {}, el('tr', {}, el('th', { textContent: 'Narwal app' }), el('th', { textContent: 'Home app' }))),
+      roomRows);
+
+    const body = el('div', { className: 'box-body' },
+      el('div', { className: 'mb-3' }, el('label', { className: 'form-label', textContent: 'Name in the Home app' }),
         nameField(saved.name, map.name, name => setMap(serial, map.id, m => {
           if (name) { m.name = name; } else { delete m.name; }
-        }), 'room-name')));
+        }), name => { title.textContent = name || map.name; })));
     if (several) {
-      block.append(switchRow('Stair detection', saved.stairDetection !== false,
-        on => setMap(serial, map.id, m => { if (on) { delete m.stairDetection; } else { m.stairDetection = false; } }),
-        'Only turn this off on floors with no stairs going down.'));
+      body.append(switchRow('Stair detection', saved.stairDetection !== false, on => {
+        stairBadge.hidden = on;
+        return setMap(serial, map.id, m => { if (on) { delete m.stairDetection; } else { m.stairDetection = false; } });
+      }, 'Only turn this off on floors with no stairs going down.'));
     }
-    if (!map.hasDock) {
-      block.append(el('p', { className: 'hint mb-2', textContent: 'No base station on this floor.' }));
-    }
-    block.append(el('b', { textContent: 'Rooms' }), rooms);
-    return block;
+    body.append(el('div', { className: 'table-responsive' }, table));
+    return { body, title, badges };
   }
 
   function roomsBlock(robot, entry) {
     const maps = robot.id ? status.maps?.[robot.id] : undefined;
     if (!maps?.length) {
-      return el('div', { className: 'alert alert-info mb-3', textContent: status.started
+      return el('div', { className: 'alert alert-info mb-0', textContent: status.started
         ? 'Waiting for this robot\'s rooms. The vacuum appears in the Home app once they arrive; if it takes more '
           + 'than a few minutes, check that the robot is online and has a saved map.'
         : 'Save and restart this plugin\'s bridge; the robot\'s rooms load by themselves.' });
     }
     const several = maps.length > 1;
-    const box = el('div', { className: 'mb-3' },
-      el('b', { textContent: several ? 'Floors' : 'Rooms' }),
-      el('p', { className: 'hint mb-0', textContent: 'Change the names the Home app shows. Changed your maps in the Narwal '
+    const box = el('div', { className: 'section' },
+      el('h6', { textContent: several ? 'Floors' : 'Rooms' }),
+      el('p', { className: 'hint mt-1 mb-2', textContent: 'Change the names the Home app shows. Changed your maps in the Narwal '
         + 'app? They show up here within 6 hours, or when you restart the bridge.' }));
     for (const map of maps) {
-      box.append(several ? el('details', { className: 'floor', open: false },
-        el('summary', { textContent: map.name }), floorBlock(robot.serial, entry, map, several))
-        : floorBlock(robot.serial, entry, map, several));
+      const floor = floorBlock(robot.serial, entry, map, several);
+      box.append(several
+        ? el('details', { className: 'box', open: false },
+          el('summary', {}, el('span', { className: 'sum' }, floor.title, ...floor.badges)), floor.body)
+        : floor.body);
     }
     return box;
   }
@@ -388,10 +455,13 @@
       }
     };
     render();
+    const width = f => (f === 'task' ? 11 : 8.5);
+    const cols = el('colgroup', {}, el('col', { style: 'width: 8rem' }), ...fields.map(f => el('col', { style: `width: ${width(f)}rem` })));
     const head = el('thead', {}, el('tr', {}, el('th'), ...fields.map(f => el('th', { textContent: FIELD_TITLES[f] }))));
-    return el('details', { className: 'group' },
-      el('summary', { textContent: group }),
-      el('div', { className: 'table-responsive mt-2' }, el('table', { className: 'table table-sm modes mb-1' }, head, body)));
+    return el('details', { className: 'box' },
+      el('summary', {}, el('span', { className: 'sum', textContent: group })),
+      el('div', { className: 'box-body table-responsive' },
+        el('table', { className: 'table table-sm modes', style: `width: ${8 + fields.reduce((n, f) => n + width(f), 0)}rem` }, cols, head, body)));
   }
 
   /** Store only what differs from the defaults, so a slot left alone follows future defaults. */
@@ -422,40 +492,41 @@
 
   function robotCard(robot, entry, several) {
     const serial = robot.serial;
-    const settings = el('div', { className: 'mt-3' });
-    const title = el('summary', { textContent: entry.name || robot.name });
-    const details = el('details', { className: 'robot', open: !several || entry.enabled !== false }, title);
+    const settings = el('div', { className: several ? 'settings' : 'settings mt-3' });
+    const title = el('span', { textContent: entry.name || robot.name });
+    const heading = el('h5', { className: 'mb-0' }, title);
+    const intro = [];
 
     if (robot.firmware) {
-      details.append(el('p', { className: 'hint mt-2 mb-0', textContent:
+      intro.push(el('p', { className: 'hint mt-1 mb-0', textContent:
         `${robot.name}, serial ${serial}, firmware ${robot.firmware}` }));
     }
     if (robot.supported === false) {
-      details.append(el('div', { className: 'alert alert-warning mt-2 mb-0', textContent: 'This plugin only supports the '
+      intro.push(el('div', { className: 'alert alert-warning mt-2 mb-0', textContent: 'This plugin only supports the '
         + 'original Narwal Freo (YJCC012). This robot may not work.' }));
     }
     if (several) {
-      details.append(el('div', { className: 'mt-3' }, switchRow('Show in the Home app', entry.enabled !== false, async on => {
+      intro.push(el('div', { className: 'mt-3' }, switchRow('Show in the Home app', entry.enabled !== false, async on => {
         await setRobot(serial, e => { if (on) { delete e.enabled; } else { e.enabled = false; } });
         settings.hidden = !on;
       })));
     }
     settings.hidden = several && entry.enabled === false;
 
-    const name = el('input', { className: 'form-control', type: 'text', value: entry.name ?? '', placeholder: robot.name });
+    const name = el('input', { className: 'form-control name-input', type: 'text', value: entry.name ?? '', placeholder: robot.name });
     name.addEventListener('change', async () => {
       await setRobot(serial, e => { if (name.value.trim()) { e.name = name.value.trim(); } else { delete e.name; } });
       title.textContent = name.value.trim() || robot.name;
     });
     settings.append(
-      el('div', { className: 'mb-3' }, el('label', { className: 'form-label', textContent: 'Name in the Home app' }), name,
-        el('div', { className: 'hint mt-1', textContent: 'For example "Upstairs" and "Downstairs" in a home with two robots.' })),
+      el('div', {}, el('label', { className: 'form-label', textContent: 'Name in the Home app' }), name,
+        el('div', { className: 'hint mt-1 mb-0', textContent: 'For example "Upstairs" and "Downstairs" in a home with two robots.' })),
       roomsBlock(robot, entry),
     );
 
-    const modes = el('div', { className: 'mb-3' },
-      el('b', { textContent: 'Clean modes' }),
-      el('p', { className: 'hint mb-1', textContent: 'Choose what each clean mode in the Home app does. Default uses '
+    const modes = el('div', { className: 'section' },
+      el('h6', { textContent: 'Clean modes' }),
+      el('p', { className: 'hint mt-1 mb-2', textContent: 'Choose what each clean mode in the Home app does. Default uses '
         + 'each room\'s settings from the Narwal app.' }));
     for (const g of GROUPS) {
       modes.append(modeGroup(serial, entry, g));
@@ -464,9 +535,9 @@
 
     const replace = el('input', { className: 'form-control', type: 'number', min: 0, max: 100, value: entry.replaceAtPercent ?? 10 });
     replace.addEventListener('change', () => setRobot(serial, e => { e.replaceAtPercent = Number(replace.value); }));
-    const replaceBox = el('div', { className: 'mb-3 ms-4', hidden: !entry.consumables },
-      el('label', { className: 'form-label', textContent: 'Warn to replace at (% left)' }), replace);
-    settings.append(
+    const replaceBox = el('div', { className: 'sub mb-3', hidden: !entry.consumables },
+      el('label', { className: 'form-label', textContent: 'Warn to replace at (% left)' }), numberGroup(replace, '%'));
+    settings.append(el('div', { className: 'section' },
       switchRow('Cleaning sensor', Boolean(entry.cleaningSensor), on => setRobot(serial, e => { e.cleaningSensor = on; }),
         'Shows when the robot is cleaning, so Home app automations can react to it. Pair this plugin\'s bridge '
         + 'in the Home app too.'),
@@ -476,9 +547,15 @@
       }, 'Life left on the filter, brushes, mops and sponge. The Home app doesn\'t show these; use an app such as '
         + 'Eve or Controller.'),
       replaceBox,
-    );
-    details.append(settings);
-    return el('div', { className: 'card card-body mb-3' }, details);
+    ));
+
+    // With several robots each one collapses; a lone robot is a plain card.
+    if (several) {
+      const details = el('details', { className: 'robot', open: entry.enabled !== false },
+        el('summary', {}, heading), ...intro, settings);
+      return el('div', { className: 'card card-body mb-3' }, details);
+    }
+    return el('div', { className: 'card card-body mb-3' }, heading, ...intro, settings);
   }
 
   async function showRobots(robots) {
