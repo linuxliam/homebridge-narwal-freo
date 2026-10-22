@@ -2,6 +2,17 @@
 
 ## 0.6.0 (unreleased)
 
+- Floors without a base station: the plugin turns off the Narwal app's "Automatically switch to the main
+  map after cleaning" setting while it cleans or sends the robot to the starting point there, and turns it
+  back on afterwards (also after a restart, or when the robot is seen on its base). A setting you had off
+  is left alone. If it can't be changed, the plugin switches the map back itself.
+- Errors the plugin itself puts on the tile (a refused start, a stopped room queue, a wrong floor) clear after
+  a minute, and at once when you start, resume or send the robot home, because the Home app hides the
+  vacuum's controls while it shows an error. The robot's own errors still clear only when the robot does.
+- Floors without a base station: if the robot switches to the main map when a job ends (the Narwal app's
+  "switch to the main map after cleaning" setting), the plugin switches it back before the next room or
+  the trip to the starting point. Zone jobs no longer show a wrong room on the tile, and the start log
+  lists the rooms in the order they are cleaned.
 - Rooms the Narwal app shows by type now get the app's names (Bathroom, Hallway, Toilet, Closet, …) in
   title case (Living Room, Master Bedroom); some were wrong before, e.g. a bathroom was called Study.
   Room numbers are unchanged, so scenes and automations keep working, but Siri and the Home app use the new names.

@@ -144,6 +144,9 @@ floor's starting point (the P on the Narwal app's map) to avoid this.
   security hold kept in force until the last. Stopping, an error, Return to dock or a restart of Homebridge ends the rest of the
   list. Pick no room to clean the whole floor. The robot limits mopping there to about 14 m²
   (150 sq ft) per job, because it has no base to wash the mops; it stops by itself at its limit.
+  While the plugin works on such a floor it turns off the Narwal app's "Automatically switch to the main
+  map after cleaning" setting (the robot would otherwise leave the floor after every room) and turns it
+  back on afterwards; if you had it off, it stays off.
 - **Return to dock** on a floor without a base station stops the clean at once and sends the robot
   back to that floor's starting point (the "P" on the map in the Narwal app). The robot refuses to be
   recalled there and has no "go to" command, so the plugin sends it on a tiny zone clean of about
